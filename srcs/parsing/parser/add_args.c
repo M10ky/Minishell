@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   add_args.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
+/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/29 14:36:20 by tarandri          #+#    #+#             */
-/*   Updated: 2025/12/29 14:44:18 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/02 11:44:11 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ static	int	cmd_args_len(char **args)
 {
 	int	i;
 
+	if (!args)
+		return (0);
 	i = 0;
 	while (args[i])
 		i++;
@@ -28,6 +30,8 @@ int	add_argument(t_command *cmd, char *arg)
 	int		j;
 	char	**new_args;
 
+	if (!cmd || !arg)
+		return (0);
 	i = cmd_args_len(cmd->args);
 	j = 0;
 	new_args = malloc((i + 2) * sizeof(char *));
@@ -45,7 +49,8 @@ int	add_argument(t_command *cmd, char *arg)
 		return (0);
 	}
 	new_args[i + 1] = NULL;
-	free(cmd->args);
+	if (cmd->args)
+		free(cmd->args);
 	cmd->args = new_args;
 	return (1);
 }

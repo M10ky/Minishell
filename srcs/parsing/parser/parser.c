@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
+/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/26 07:45:47 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 09:47:20 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/02 11:44:54 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,13 @@ static t_command	*init_command(void)
 	command = malloc(sizeof(t_command));
 	if (!command)
 		return (NULL);
-	command->args = NULL;
+	command->args = malloc(sizeof(char *) * 1);  // FIX: Initialiser args
+	if (!command->args)
+	{
+		free(command);
+		return (NULL);
+	}
+	command->args[0] = NULL;  // FIX: Terminer par NULL
 	command->input_redirection = NULL;
 	command->output_redirection = NULL;
 	command->is_heredoc = 0;
@@ -57,31 +63,38 @@ t_command	*parse(t_token *tokens)
 	command_list = NULL;
 	current_cmd = init_command();
 	current = tokens;
-	if (!tokens)
+	if (!tokens || !current_cmd)
 		return (NULL);
 	while (current)
 	{
 		if (current->type == WORD)
-			add_argument(current_cmd, current->value);
+		{
+			if (!add_argument(current_cmd, current->value))
+				return (cleanup_and_return(&command_list, current_cmd), NULL);
+		}
 		else if (current->type == REDIRECT_IN)
 		{
 			if (!handle_input_redirection(current_cmd, &current))
 				return (cleanup_and_return(&command_list, current_cmd), NULL);
+			continue;  // handle_input_redirection avance current
 		}
 		else if (current->type == REDIRECT_OUT)
 		{
 			if (!handle_output_redirection(current_cmd, &current, 0))
 				return (cleanup_and_return(&command_list, current_cmd), NULL);
+			continue;
 		}
 		else if (current->type == APPEND)
 		{
 			if (!handle_output_redirection(current_cmd, &current, 1))
 				return (cleanup_and_return(&command_list, current_cmd), NULL);
+			continue;
 		}
 		else if (current->type == HEREDOC)
 		{
 			if (!handle_heredoc(current_cmd, &current))
 				return (cleanup_and_return(&command_list, current_cmd), NULL);
+			continue;
 		}
 		else if (current->type == PIPE)
 		{

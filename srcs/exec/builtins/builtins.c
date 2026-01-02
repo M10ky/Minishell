@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/17 21:32:09 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/02 10:24:10 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/02 11:43:19 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static int	is_parent_builtin(char *cmd, t_shell *shell)
 {
-	if (!cmd || !shell->commands)
+	if (!cmd || !shell || !shell->commands)
 		return (0);
 	if (!shell->commands->next)
 	{

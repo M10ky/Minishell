@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
+/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:25:06 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 06:04:25 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/02 11:23:14 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ t_token	*tokenize(char *input)
 
 	tokens = NULL;
 	i = 0;
-	if (!input)
+	if (!input || !*input)
 		return (NULL);
 	while (input[i])
 	{
@@ -108,6 +108,6 @@ t_token	*tokenize(char *input)
 	if (!new_token)
 		return (free_tokens(tokens), NULL);
 	add_token_back(&tokens, new_token);
-	
+
 	return (tokens);
 }

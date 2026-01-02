@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:33:27 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 11:14:31 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/02 11:46:14 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,55 +14,143 @@
 
 int g_received_signal = 0;
 
-
-// int main(int argc, char **argv, char **envp)
-// {
-// 	t_shell	shell;
-
-// 	(void)argc;
-// 	(void)argv;
-// 	shell.env = dup_env(envp);
-// 	shell.last_exit_status = 0;
-// 	while (1)
-// 	{
-// 		shell.input = readline("minishell> ");
-// 		shell.tokens = tokenize(shell.input);
-// 		if (check_tokens(shell.tokens))
-// 		{
-// 			free_tokens(shell.tokens);
-// 			continue ;
-// 		}
-// 		expand_tokens(shell.tokens, &shell);
-// 		clean_empty_tokens(&shell.tokens);
-// 		shell.commands = parse(shell.tokens);
-//         executor(&shell);
-// 		free_tokens(shell.tokens);
-// 		free_cmds(shell.commands);
-// 		free(shell.input);
-// 	}
-// 	free_env_list(shell.env);
-// 	return (0);
-// }
-
-int main(int argc, char const *argv[])
+int main(int argc, char **argv, char **envp)
 {
+	t_shell	shell;
+
 	(void)argc;
 	(void)argv;
-	// Initialize shell
-	printf("Welcome to the C17 Shell!\n");
-	// Main loop
+
+	// Initialisation complète à NULL/0
+	shell.input = NULL;
+	shell.env = NULL;
+	shell.tokens = NULL;
+	shell.commands = NULL;
+	shell.last_exit_status = 0;
+
+	// Vérification de base
+	if (!envp)
+	{
+		ft_putstr_fd("minishell: invalid environment\n", 2);
+		return (1);
+	}
+
+	// Duplication de l'environnement
+	shell.env = dup_env(envp);
+	if (!shell.env)
+	{
+		ft_putstr_fd("minishell: error initializing environment\n", 2);
+		return (1);
+	}
+
+	// Configuration des signaux
+	setup_prompt_signal();
+
+	// Boucle principale
 	while (1)
 	{
-		// Read user input
-		char *input = readline("minishell> ");
-		if (!input)
-			break;
+		g_received_signal = 0;
 
-		// Parse and execute commands
-		printf("You entered: %s\n", input);
-		free(input);
-		// Execute commands here
-		
+		// Lecture de l'entrée
+		shell.input = readline("minishell> ");
+
+		// EOF (Ctrl+D)
+		if (!shell.input)
+		{
+			ft_putstr_fd("exit\n", 2);
+			break;
+		}
+
+		// Ligne vide
+		if (shell.input[0] == '\0')
+		{
+			free(shell.input);
+			shell.input = NULL;
+			continue;
+		}
+
+		// Ajout à l'historique
+		add_history(shell.input);
+
+		// Tokenisation
+		shell.tokens = tokenize(shell.input);
+		if (!shell.tokens)
+		{
+			free(shell.input);
+			shell.input = NULL;
+			continue;
+		}
+
+		// Vérification syntaxe
+		if (check_tokens(shell.tokens))
+		{
+			shell.last_exit_status = 2;
+			free_tokens(shell.tokens);
+			shell.tokens = NULL;
+			free(shell.input);
+			shell.input = NULL;
+			continue;
+		}
+
+		// Expansion
+		expand_tokens(shell.tokens, &shell);
+		clean_empty_tokens(&shell.tokens);
+
+		// Si plus de tokens après nettoyage
+		if (!shell.tokens)
+		{
+			free(shell.input);
+			shell.input = NULL;
+			continue;
+		}
+
+		// Parsing
+		shell.commands = parse(shell.tokens);
+		if (!shell.commands)
+		{
+			free_tokens(shell.tokens);
+			shell.tokens = NULL;
+			free(shell.input);
+			shell.input = NULL;
+			continue;
+		}
+
+		// Vérification commande valide
+		if (shell.commands->args && shell.commands->args[0])
+		{
+			// Exécution
+			executor(&shell);
+		}
+
+		// Nettoyage
+		if (shell.tokens)
+		{
+			free_tokens(shell.tokens);
+			shell.tokens = NULL;
+		}
+		if (shell.commands)
+		{
+			free_cmds(shell.commands);
+			shell.commands = NULL;
+		}
+		if (shell.input)
+		{
+			free(shell.input);
+			shell.input = NULL;
+		}
 	}
-	return 0;
+
+	// Nettoyage final
+	if (shell.env)
+		free_env_list(shell.env);
+	if (shell.tokens)
+		free_tokens(shell.tokens);
+	if (shell.commands)
+		free_cmds(shell.commands);
+	if (shell.input)
+		free(shell.input);
+
+	rl_clear_history();
+
+	return (shell.last_exit_status);
 }
