@@ -1,4 +1,2 @@
-redir > a > b => a vide, b truncate
 
-heredoc << >
-	Ctrl + C mapseo ^C
+expand
