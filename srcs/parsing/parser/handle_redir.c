@@ -3,55 +3,107 @@
 /*                                                        :::      ::::::::   */
 /*   handle_redir.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
+/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/29 14:57:18 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 09:38:39 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/02 16:44:24 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/parsing.h"
 
+/**
+ * Gère les redirections d'entrée: cmd < file
+ * Ajoute le fichier à la liste des redirections d'entrée
+ */
 int	handle_input_redirection(t_command *cmd, t_token **current)
 {
+	t_redir	*new_redir;
+
 	*current = (*current)->next;
 	if (!*current || (*current)->type != WORD)
 		return (0);
-	if (cmd->input_redirection)
-		free(cmd->input_redirection);
-	cmd->input_redirection = ft_strdup((*current)->value);
-	if (!cmd->input_redirection)
+
+	// Créer un nouveau nœud de redirection
+	new_redir = create_redir_node((*current)->value);
+	if (!new_redir)
 		return (0);
+
+	// Ajouter à la liste des redirections d'entrée
+	add_redir_back(&cmd->input_redirection, new_redir);
+
 	*current = (*current)->next;
 	return (1);
 }
 
-int	handle_output_redirection(t_command *cmd, t_token **current, int append)
+/**
+ * Gère les redirections de sortie: cmd > file
+ * Ajoute le fichier à la liste des redirections de sortie
+ */
+int	handle_output_redirection(t_command *cmd, t_token **current)
 {
+	t_redir	*new_redir;
+
 	*current = (*current)->next;
 	if (!*current || (*current)->type != WORD)
 		return (0);
-	if (cmd->output_redirection)
-		free(cmd->output_redirection);
-	cmd->output_redirection = ft_strdup((*current)->value);
-	if (!cmd->output_redirection)
+
+	// Créer un nouveau nœud de redirection
+	new_redir = create_redir_node((*current)->value);
+	if (!new_redir)
 		return (0);
-	cmd->append_output = append;
+
+	// Ajouter à la liste des redirections de sortie
+	add_redir_back(&cmd->output_redirection, new_redir);
+
 	*current = (*current)->next;
 	return (1);
 }
 
+/**
+ * Gère les redirections en mode append: cmd >> file
+ * Ajoute le fichier à la liste des appends
+ */
+int	handle_append_redirection(t_command *cmd, t_token **current)
+{
+	t_redir	*new_redir;
+
+	*current = (*current)->next;
+	if (!*current || (*current)->type != WORD)
+		return (0);
+
+	// Créer un nouveau nœud de redirection
+	new_redir = create_redir_node((*current)->value);
+	if (!new_redir)
+		return (0);
+
+	// Ajouter à la liste des appends
+	add_redir_back(&cmd->append, new_redir);
+
+	*current = (*current)->next;
+	return (1);
+}
+
+/**
+ * Gère les heredocs: cmd << delimiter
+ * Ajoute le délimiteur à la liste des heredocs
+ */
 int	handle_heredoc(t_command *cmd, t_token **current)
 {
+	t_redir	*new_redir;
+
 	*current = (*current)->next;
 	if (!*current || (*current)->type != WORD)
 		return (0);
-	if (cmd->input_redirection)
-		free(cmd->input_redirection);
-	cmd->input_redirection = ft_strdup((*current)->value);
-	if (!cmd->input_redirection)
+
+	// Créer un nouveau nœud de redirection avec le délimiteur
+	new_redir = create_redir_node((*current)->value);
+	if (!new_redir)
 		return (0);
-	cmd->is_heredoc = 1;
+
+	// Ajouter à la liste des heredocs
+	add_redir_back(&cmd->heredoc, new_redir);
+
 	*current = (*current)->next;
 	return (1);
 }

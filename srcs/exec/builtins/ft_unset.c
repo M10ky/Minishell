@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/04 22:41:18 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 10:54:05 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/02 22:23:27 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static int	is_valid_identifier(const char *str)
 	return (1);
 }
 
-static void	remove_env_node(t_env **head, const char *key)
+static void	remove_env_node(t_env **head, char *key)
 {
 	t_env	*current;
 	t_env	*prev;
@@ -40,7 +40,7 @@ static void	remove_env_node(t_env **head, const char *key)
 	prev = NULL;
 	while (current)
 	{
-		if (strcmp(current->key, key) == 0)
+		if (ft_strcmp(current->key, key) == 0)
 		{
 			if (prev == NULL)
 				*head = current->next;

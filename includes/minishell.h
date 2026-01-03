@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 20:22:34 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 10:59:36 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/02 22:29:35 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # include <fcntl.h>
 # include <sys/types.h>
 # include <sys/wait.h>
-#include <sys/stat.h>
+# include <sys/stat.h>
 # include <errno.h>
 # include <signal.h>
 # include <readline/readline.h>
@@ -56,14 +56,21 @@ typedef struct s_token
 	struct s_token	*next;
 }	t_token;
 
+typedef struct s_redir
+{
+	// t_token_type	*type;
+	char			*file;
+	int				fd;
+	struct s_redir *next;
+}	t_redir;
+
 typedef struct s_command
 {
 	char				**args;
-	char				*input_redirection;
-	char				*output_redirection;
-	int					is_heredoc; // detecte si y a heredoc dans token 1/0
-	int					append_output; // 1 if >>, 0 if >
-	int					value_return; // Return value of the command
+	t_redir				*input_redirection; //file an  le redirect_in <
+	t_redir				*output_redirection; //file an  le redirect_out >
+	t_redir				*heredoc; //file an heredoc <<
+	t_redir				*append; //file an  append >>
 	struct s_command	*next;
 }	t_command;
 

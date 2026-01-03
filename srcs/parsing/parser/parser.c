@@ -6,12 +6,15 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/26 07:45:47 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 11:44:54 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/02 22:42:09 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/parsing.h"
 
+/**
+ * Initialise une nouvelle commande avec toutes les listes à NULL
+ */
 static t_command	*init_command(void)
 {
 	t_command	*command;
@@ -19,22 +22,29 @@ static t_command	*init_command(void)
 	command = malloc(sizeof(t_command));
 	if (!command)
 		return (NULL);
-	command->args = malloc(sizeof(char *) * 1);  // FIX: Initialiser args
+
+	// Initialiser args avec un tableau vide
+	command->args = malloc(sizeof(char *) * 1);
 	if (!command->args)
 	{
 		free(command);
 		return (NULL);
 	}
-	command->args[0] = NULL;  // FIX: Terminer par NULL
+	command->args[0] = NULL;
+
+	// Initialiser toutes les listes de redirections à NULL
 	command->input_redirection = NULL;
 	command->output_redirection = NULL;
-	command->is_heredoc = 0;
-	command->append_output = 0;
-	command->value_return = 0;
+	command->heredoc = NULL;
+	command->append = NULL;
 	command->next = NULL;
+
 	return (command);
 }
 
+/**
+ * Finalise une commande et l'ajoute à la liste des commandes
+ */
 int	finalize_command(t_command **command_list, t_command **current_cmd)
 {
 	t_command	*temp;
@@ -54,6 +64,9 @@ int	finalize_command(t_command **command_list, t_command **current_cmd)
 	return (1);
 }
 
+/**
+ * Parse les tokens et construit la liste de commandes
+ */
 t_command	*parse(t_token *tokens)
 {
 	t_command	*command_list;
@@ -63,50 +76,62 @@ t_command	*parse(t_token *tokens)
 	command_list = NULL;
 	current_cmd = init_command();
 	current = tokens;
+
 	if (!tokens || !current_cmd)
 		return (NULL);
+
 	while (current)
 	{
 		if (current->type == WORD)
 		{
+			// Ajouter un argument
 			if (!add_argument(current_cmd, current->value))
 				return (cleanup_and_return(&command_list, current_cmd), NULL);
 		}
 		else if (current->type == REDIRECT_IN)
 		{
+			// Redirection d'entrée: <
 			if (!handle_input_redirection(current_cmd, &current))
 				return (cleanup_and_return(&command_list, current_cmd), NULL);
 			continue;  // handle_input_redirection avance current
 		}
 		else if (current->type == REDIRECT_OUT)
 		{
-			if (!handle_output_redirection(current_cmd, &current, 0))
+			// Redirection de sortie: >
+			if (!handle_output_redirection(current_cmd, &current))
 				return (cleanup_and_return(&command_list, current_cmd), NULL);
 			continue;
 		}
 		else if (current->type == APPEND)
 		{
-			if (!handle_output_redirection(current_cmd, &current, 1))
+			// Redirection en mode append: >>
+			if (!handle_append_redirection(current_cmd, &current))
 				return (cleanup_and_return(&command_list, current_cmd), NULL);
 			continue;
 		}
 		else if (current->type == HEREDOC)
 		{
+			// Heredoc: <<
 			if (!handle_heredoc(current_cmd, &current))
 				return (cleanup_and_return(&command_list, current_cmd), NULL);
 			continue;
 		}
 		else if (current->type == PIPE)
 		{
+			// Pipe: finaliser la commande courante et en créer une nouvelle
 			if (!finalize_command(&command_list, &current_cmd))
 				return (cleanup_and_return(&command_list, NULL), NULL);
 			current_cmd = init_command();
 			if (!current_cmd)
 				return (cleanup_and_return(&command_list, NULL), NULL);
 		}
+
 		current = current->next;
 	}
+
+	// Finaliser la dernière commande
 	if (current_cmd)
 		finalize_command(&command_list, &current_cmd);
+
 	return (command_list);
 }

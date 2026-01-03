@@ -1,6 +1,6 @@
 NAME = minishell
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g3
 RM = rm -rf
 
 SRCS =  srcs/main.c \
@@ -18,6 +18,7 @@ SRCS =  srcs/main.c \
 		srcs/parsing/parser/add_args.c \
 		srcs/parsing/parser/free_cmd.c \
 		srcs/parsing/parser/handle_redir.c \
+		srcs/parsing/parser/redir_utils.c \
 		srcs/parsing/parser/parser.c \
 		srcs/parsing/env/env_dup_utils.c \
 		srcs/parsing/env/env_duplicate.c \
@@ -32,7 +33,7 @@ SRCS =  srcs/main.c \
 		srcs/exec/redirection/heredoc.c \
 		srcs/exec/utils/get_next_line.c \
 		srcs/exec/builtins/ft_export.c \
-		srcs/exec/builtins/ft_unset.c \
+		srcs/exec/builtins/ft_unset.c
 
 OBJS = $(SRCS:.c=.o)
 
@@ -48,7 +49,7 @@ $(LIBFT):
 	make -C $(LIBFT_DIR)
 
 %.o: %.c
-	$(CC) $(CFLAGS) -I./includes -I$(LIBFT_DIR)/includes -c $< -o $@
+	$(CC) $(CFLAGS) -I./includes -I$(LIBFT_DIR) -c $< -o $@
 
 clean:
 	$(RM) $(OBJS)

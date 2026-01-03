@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/04 22:37:54 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 10:55:29 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/02 14:03:47 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,10 +71,10 @@ static char	*extract_value(const char *arg)
 	char	*equal_sign;
 	char	*value;
 
-	equal_sign = strchr(arg, '=');
+	equal_sign = ft_strchr(arg, '=');
 	if (!equal_sign)
 		return (NULL);
-	value = strdup(equal_sign + 1);
+	value = ft_strdup(equal_sign + 1);
 	return (value);
 }
 
@@ -85,10 +85,10 @@ static int	update_or_add_env(t_shell *shell, char *key, char *value)
 	current = shell->env;
 	while (current)
 	{
-		if (strcmp(current->key, key) == 0)
+		if (ft_strcmp(current->key, key) == 0)
 		{
 			free(current->value);
-			current->value = strdup(value);
+			current->value = ft_strdup(value);
 			return (0);
 		}
 		current = current->next;

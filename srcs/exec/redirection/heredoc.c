@@ -6,11 +6,15 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 15:45:17 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/02 10:24:32 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/02 22:22:28 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/exec.h"
+
+/* ========================================================================== */
+/*                         EXPANSION DU CONTENU HEREDOC                       */
+/* ========================================================================== */
 
 static void	expand_var_value(char *line, int *i, int fd, t_shell *shell)
 {
@@ -66,6 +70,10 @@ void	expand_heredoc_line(char *line, int fd, t_shell *shell)
 	write(fd, "\n", 1);
 }
 
+/* ========================================================================== */
+/*                      DÉTECTION DE L'EXPANSION NÉCESSAIRE                   */
+/* ========================================================================== */
+
 static int	should_expand(char *delimiter)
 {
 	if (ft_strchr(delimiter, '\'') || ft_strchr(delimiter, '"'))
@@ -100,12 +108,15 @@ static char	*clean_delimiter(char *delimiter)
 	return (cleaned);
 }
 
+/* ========================================================================== */
+/*                        CRÉATION DU FICHIER HEREDOC                         */
+/* ========================================================================== */
+
 static int	handle_heredoc_interrupt(char *line, int fd)
 {
 	if (line)
 		free(line);
 	close(fd);
-	unlink("/tmp/.heredoc_tmp");
 	return (-1);
 }
 
@@ -123,8 +134,7 @@ int	create_heredoc_file(char *delimiter, char *filename)
 	int		fd;
 	char	*line;
 
-	(void)filename;
-	fd = open("/tmp/.heredoc_tmp", O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (fd == -1)
 	{
 		perror("minishell: heredoc");
@@ -146,6 +156,10 @@ int	create_heredoc_file(char *delimiter, char *filename)
 		free(line);
 	}
 }
+
+/* ========================================================================== */
+/*                     EXPANSION DU CONTENU DU HEREDOC                        */
+/* ========================================================================== */
 
 static void	copy_expanded_file(int fd_in, int fd_out)
 {
@@ -178,49 +192,72 @@ static void	process_heredoc_lines(int fd_in, int fd_out, t_shell *shell)
 	}
 }
 
-static void	replace_heredoc_file(void)
+static void	replace_heredoc_file(char *tmpfile)
 {
-	int	fd_in;
-	int	fd_final;
+	int		fd_in;
+	int		fd_final;
+	char	*final_file;
 
-	fd_in = open("/tmp/.heredoc_final", O_RDONLY);
-	fd_final = open("/tmp/.heredoc_tmp", O_WRONLY | O_TRUNC);
+	final_file = ft_strjoin(tmpfile, ".final");
+	if (!final_file)
+		return ;
+
+	fd_in = open(final_file, O_RDONLY);
+	fd_final = open(tmpfile, O_WRONLY | O_TRUNC);
 	if (fd_in != -1 && fd_final != -1)
 		copy_expanded_file(fd_in, fd_final);
 	if (fd_in != -1)
 		close(fd_in);
 	if (fd_final != -1)
 		close(fd_final);
-	unlink("/tmp/.heredoc_final");
+	unlink(final_file);
+	free(final_file);
 }
 
-static void	expand_heredoc_content(t_shell *shell)
+static void	expand_heredoc_content(t_shell *shell, char *tmpfile)
 {
 	int		fd_in;
 	int		fd_out;
+	char	*final_file;
 
-	fd_in = open("/tmp/.heredoc_tmp", O_RDONLY);
-	fd_out = open("/tmp/.heredoc_final", O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	final_file = ft_strjoin(tmpfile, ".final");
+	if (!final_file)
+		return ;
+
+	fd_in = open(tmpfile, O_RDONLY);
+	fd_out = open(final_file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (fd_in != -1 && fd_out != -1)
 	{
 		process_heredoc_lines(fd_in, fd_out, shell);
 		close(fd_in);
 		close(fd_out);
-		replace_heredoc_file();
+		replace_heredoc_file(tmpfile);
 	}
+	else
+	{
+		if (fd_in != -1)
+			close(fd_in);
+		if (fd_out != -1)
+			close(fd_out);
+	}
+	free(final_file);
 }
 
-static int	child_heredoc_process(char *clean_delim, int do_expand,
-								t_shell *shell)
+/* ========================================================================== */
+/*                    GESTION DES PROCESSUS HEREDOC                           */
+/* ========================================================================== */
+
+static int	child_heredoc_process(char *clean_delim, char *tmpfile,
+								int do_expand, t_shell *shell)
 {
-	if (create_heredoc_file(clean_delim, "/tmp/.heredoc_tmp") == -1)
+	if (create_heredoc_file(clean_delim, tmpfile) == -1)
 	{
 		free(clean_delim);
 		cleanup_child(shell);
 		exit(130);
 	}
 	if (do_expand)
-		expand_heredoc_content(shell);
+		expand_heredoc_content(shell, tmpfile);
 	free(clean_delim);
 	cleanup_child(shell);
 	exit(0);
@@ -252,55 +289,150 @@ static int	parent_wait_heredoc(pid_t pid, t_shell *shell)
 	return (0);
 }
 
-static int	process_single_heredoc(t_command *cmd, t_shell *shell)
+/* ========================================================================== */
+/*                   TRAITEMENT D'UN SEUL NŒUD HEREDOC                        */
+/* ========================================================================== */
+
+static char	*generate_tmpfile_name(char *delimiter, int index)
+{
+	char	*index_str;
+	char	*tmp1;
+	char	*tmp2;
+	char	*result;
+
+	index_str = ft_itoa(index);
+	if (!index_str)
+		return (NULL);
+	tmp1 = ft_strjoin("/tmp/.heredoc_", delimiter);
+	if (!tmp1)
+	{
+		free(index_str);
+		return (NULL);
+	}
+	tmp2 = ft_strjoin(tmp1, "_");
+	free(tmp1);
+	if (!tmp2)
+	{
+		free(index_str);
+		return (NULL);
+	}
+	result = ft_strjoin(tmp2, index_str);
+	free(tmp2);
+	free(index_str);
+	return (result);
+}
+
+static int	process_single_heredoc_node(t_redir *heredoc_node, t_shell *shell,
+											int index)
 {
 	int		do_expand;
 	char	*clean_delim;
+	char	*tmpfile;
 	pid_t	pid;
 
-	do_expand = should_expand(cmd->input_redirection);
-	clean_delim = clean_delimiter(cmd->input_redirection);
+	if (!heredoc_node || !heredoc_node->file)
+		return (1);
+	tmpfile = generate_tmpfile_name(heredoc_node->file, index);
+	if (!tmpfile)
+		return (1);
+	do_expand = should_expand(heredoc_node->file);
+	clean_delim = clean_delimiter(heredoc_node->file);
+	if (!clean_delim)
+	{
+		free(tmpfile);
+		return (1);
+	}
 	pid = fork();
 	if (pid == -1)
 	{
 		perror("minishell: fork");
 		free(clean_delim);
+		free(tmpfile);
 		return (1);
 	}
 	if (pid == 0)
-		child_heredoc_process(clean_delim, do_expand, shell);
+		child_heredoc_process(clean_delim, tmpfile, do_expand, shell);
 	else
 	{
 		if (parent_wait_heredoc(pid, shell))
-			return (free(clean_delim), 1);
-		free(cmd->input_redirection);
-		cmd->input_redirection = ft_strdup("/tmp/.heredoc_tmp");
-		cmd->is_heredoc = 0;
+		{
+			free(clean_delim);
+			free(tmpfile);
+			return (1);
+		}
+		free(heredoc_node->file);
+		heredoc_node->file = tmpfile;
 	}
 	free(clean_delim);
 	return (0);
 }
 
+/* ========================================================================== */
+/*              TRAITEMENT DE TOUS LES HEREDOCS D'UNE COMMANDE                */
+/* ========================================================================== */
+
+static int	process_cmd_heredocs(t_command *cmd, t_shell *shell)
+{
+	t_redir	*current;
+	int		result;
+	int		index;
+
+	if (!cmd || !cmd->heredoc)
+		return (0);
+	current = cmd->heredoc;
+	index = 0;
+	while (current)
+	{
+		result = process_single_heredoc_node(current, shell, index);
+		if (result != 0)
+			return (result);
+		current = current->next;
+		index++;
+	}
+	return (0);
+}
+
+/* ========================================================================== */
+/*             TRAITEMENT DE TOUS LES HEREDOCS DE TOUTES LES COMMANDES       */
+/* ========================================================================== */
+
 int	process_heredocs(t_shell *shell)
 {
 	t_command	*cmd;
 
+	if (!shell || !shell->commands)
+		return (0);
 	cmd = shell->commands;
 	while (cmd)
 	{
-		if (cmd->is_heredoc && cmd->input_redirection)
-		{
-			if (process_single_heredoc(cmd, shell))
-				return (1);
-		}
+		if (process_cmd_heredocs(cmd, shell))
+			return (1);
 		cmd = cmd->next;
 	}
 	return (0);
 }
 
+/* ========================================================================== */
+/*                     NETTOYAGE DES FICHIERS TEMPORAIRES                     */
+/* ========================================================================== */
+
 void	cleanup_heredocs(t_shell *shell)
 {
-	(void)shell;
-	unlink("/tmp/.heredoc_tmp");
-	unlink("/tmp/.heredoc_final");
+	t_command	*cmd;
+	t_redir		*heredoc;
+
+	if (!shell || !shell->commands)
+		return ;
+	cmd = shell->commands;
+	while (cmd)
+	{
+		heredoc = cmd->heredoc;
+		while (heredoc)
+		{
+			if (heredoc->file)
+				unlink(heredoc->file);
+			heredoc = heredoc->next;
+		}
+		cmd = cmd->next;
+	}
 }
