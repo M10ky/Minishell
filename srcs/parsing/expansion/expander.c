@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expander.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
+/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/26 07:44:36 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/03 20:39:59 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/05 21:59:32 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,29 @@ static char	*handle_dollar_expansion(char *str, int *i, char *result,
 	}
 	return (result);
 }
+static int	is_heredoc_delimiter(t_token *tokens, t_token *current)
+{
+	t_token	*prev;
 
+	if (!tokens || !current)
+		return (0);
+
+	prev = tokens;
+
+	// Cas spécial: current est le premier token
+	if (prev == current)
+		return (0);
+
+	// Chercher le token précédent
+	while (prev && prev->next != current)
+		prev = prev->next;
+
+	// Si le token précédent est <<, alors current est un délimiteur
+	if (prev && prev->type == HEREDOC)
+		return (1);
+
+	return (0);
+}
 void	expand_tokens(t_token *tokens, t_shell *shell)
 {
 	t_token	*current;
@@ -57,6 +79,15 @@ void	expand_tokens(t_token *tokens, t_shell *shell)
 	current = tokens;
 	while (current)
 	{
+		// NE PAS expanser les délimiteurs de heredoc
+		if (current->type == WORD && is_heredoc_delimiter(tokens, current))
+		{
+			// Le délimiteur reste tel quel (même avec des $)
+			current = current->next;
+			continue;
+		}
+
+		// Expanser les autres WORD normalement
 		if (current->type == WORD)
 		{
 			expanded = expand_string(current->value, shell);
