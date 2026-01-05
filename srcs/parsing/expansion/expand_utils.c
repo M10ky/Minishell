@@ -6,7 +6,7 @@
 /*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/26 10:01:54 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 09:32:45 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/03 20:39:24 by tarandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,12 @@ char	*str_append_str(char *src, char *dest)
 	new_str = malloc(sizeof(char) * (len_src + len_dest + 1));
 	if (!new_str)
 	{
-		free(src);
+		free(src);  // Libère src uniquement
 		return (NULL);
 	}
 	ft_strlcpy(new_str, src, len_src + 1);
 	ft_strlcpy(new_str + len_src, dest, len_dest + 1);
-	free(src);
+	free(src);  // Libère src, PAS dest (peut être un littéral)
 	return (new_str);
 }
 

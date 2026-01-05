@@ -6,7 +6,7 @@
 /*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/26 07:44:36 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 09:43:03 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/03 20:39:59 by tarandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,17 +17,15 @@ static char	*handle_dollar_expansion(char *str, int *i, char *result,
 {
 	char	*var_name;
 	char	*var_value;
-	char	*new_result;
 
 	(*i)++;
 	if (str[*i] == '?')
 	{
 		var_value = ft_itoa(shell->last_exit_status);
-		new_result = str_append_str(result, var_value);
+		result = str_append_str(result, var_value);  // str_append_str libère result
 		free(var_value);
-		free(result);
 		(*i)++;
-		return (new_result);
+		return (result);
 	}
 	if (str[*i] == '{')
 		var_name = extract_var_name_braces(str, i);
@@ -35,19 +33,16 @@ static char	*handle_dollar_expansion(char *str, int *i, char *result,
 		var_name = extract_var_name_simple(str, i);
 	else
 	{
-		new_result = str_append_char(result, '$');
-		free(result);
-		return (new_result);
+		result = str_append_char(result, '$');  // str_append_char libère result
+		return (result);
 	}
 	if (var_name)
 	{
 		var_value = get_env_value_copy(shell, var_name);
 		if (var_value)
 		{
-			new_result = str_append_str(result, var_value);
+			result = str_append_str(result, var_value);  // str_append_str libère result
 			free(var_value);
-			free(result);
-			result = new_result;
 		}
 		free(var_name);
 	}
@@ -88,24 +83,17 @@ char	*expand_string(char *str, t_shell *shell)
 		if (str[i] == '\'' && !in_double_quote)
 		{
 			in_single_quote = !in_single_quote;
-			result = str_append_char(result, str[i++]);
+			i++;
 		}
 		else if (str[i] == '"' && !in_single_quote)
 		{
 			in_double_quote = !in_double_quote;
-			result = str_append_char(result, str[i++]);
+			i++;
 		}
 		else if (str[i] == '$' && !in_single_quote)
 			result = handle_dollar_expansion(str, &i, result, shell);
 		else
 			result = str_append_char(result, str[i++]);
 	}
-	if (ft_strlen(result) == 0)
-	{
-		free(result);
-		return (NULL);
-	}
 	return (result);
 }
-
-
