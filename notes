@@ -1,0 +1,15 @@
+1-""
+
+2-minishell> ^C
+minishell> echo $?
+0
+
+3-minishell> cat << df << $sdf << sdfs << sfsafs
+minishell>
+
+4-bash-5.1$ ls > $fdsg
+bash: $fdsg: ambiguous redirect
+
+minishell> exit 5 | exit 6
+exit
+exit

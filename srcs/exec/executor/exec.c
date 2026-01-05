@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 15:27:36 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/02 14:06:19 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/05 12:55:52 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,18 @@ char *get_path(t_env *env, char *cmd)
 
     if (ft_strchr(cmd, '/'))
     {
+        // Vérifier si le fichier existe
         if (access(cmd, F_OK) == -1)
-            return (NULL);
+            return (NULL);  // 127 - command not found
+
+        // Le fichier existe, vérifier les permissions d'exécution
         if (access(cmd, X_OK) == -1)
-            return (NULL);
+        {
+            // IMPORTANT: Retourner le chemin même sans permission
+            // exec_simple_cmd() gérera l'erreur 126
+            return (ft_strdup(cmd));
+        }
+
         return (ft_strdup(cmd));
     }
     path_var = get_env_value(env, "PATH");
@@ -95,6 +103,14 @@ void exec_simple_cmd(t_command *cmd, t_env *env)
         ft_putstr_fd(": is a directory\n", 2);
         free(path);
         exit(126);
+    }
+    if (access(path, X_OK) == -1)
+    {
+        ft_putstr_fd("minishell: ", 2);
+        ft_putstr_fd(cmd->args[0], 2);
+        ft_putstr_fd(": Permission denied\n", 2);
+        free(path);
+        exit(126);  // Permission denied
     }
     env_tab = env_to_tab(env);
     if (!env_tab)
