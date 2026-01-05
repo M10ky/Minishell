@@ -1,8 +1,12 @@
 1-""
 
-2-minishell> ^C
+2-VITA
+minishell> ^C
 minishell> echo $?
 0
+bash-5.1$ ^C
+bash-5.1$ echo $?
+130
 
 3-minishell> cat << df << $sdf << sdfs << sfsafs
 minishell>
@@ -17,7 +21,8 @@ exit
 6-	cd -
 	cd --
 
-7 - bash-5.1$ ls << EOF >
+7 -
+bash-5.1$ ls << EOF >
 > EOF
 bash: syntax error near unexpected token `newline'
 minishell> cat << EOF >
@@ -29,3 +34,5 @@ bash-5.1$ echo $"USER"
 USER
 minishell> echo $"USER"
 $USER
+
+

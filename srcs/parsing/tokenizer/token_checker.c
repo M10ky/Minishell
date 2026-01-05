@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_checker.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
+/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 15:14:21 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 06:05:25 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/05 15:38:21 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 static int	print_syntax_error(char *token_value)
 {
 	if (token_value)
-		printf("minishell: syntax error near unexpected token `%s'\n", 
+		printf("minishell: syntax error near unexpected token `%s'\n",
 			token_value);
 	else
 		printf("minishell: syntax error near unexpected token `newline'\n");
@@ -24,7 +24,7 @@ static int	print_syntax_error(char *token_value)
 
 static int	is_redirection(t_token_type type)
 {
-	return (type == REDIRECT_IN || type == REDIRECT_OUT 
+	return (type == REDIRECT_IN || type == REDIRECT_OUT
 		|| type == APPEND || type == HEREDOC);
 }
 
@@ -43,13 +43,13 @@ int	check_tokens(t_token *tokens)
 		{
 			if (prev == NULL || prev->type == PIPE)
 				return (print_syntax_error("|"));
-			if (current->next == NULL || current->next->type == PIPE 
+			if (current->next == NULL || current->next->type == PIPE
 				|| current->next->type == END)
 				return (print_syntax_error("|"));
 		}
 		else if (is_redirection(current->type))
 		{
-			if (current->next == NULL || current->next->type == END 
+			if (current->next == NULL || current->next->type == END
 				|| current->next->type != WORD)
 			{
 				if (current->type == REDIRECT_IN)

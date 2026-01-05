@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:31:02 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/05 14:25:50 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/05 15:11:52 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,6 +171,11 @@ int	builtin_cd(char **args, t_env *env)
 	char	*old_pwd;
 
 	old_pwd = getcwd(NULL, 0);
+	if (args[2])
+	{
+		ft_putstr_fd("minishell: cd: too many arguments\n", 2);
+		return(1);
+	}
 	if (!old_pwd)
 	{
 		perror("minishell: cd: getcwd");

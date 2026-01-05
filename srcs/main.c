@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:33:27 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 11:46:14 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/05 15:23:46 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,15 @@ int main(int argc, char **argv, char **envp)
 		// Lecture de l'entrée
 		shell.input = readline("minishell> ");
 
+		if (g_received_signal == SIGINT)
+        {
+            shell.last_exit_status = 130;
+            g_received_signal = 0;
+
+            // Si readline a retourné NULL après Ctrl+C
+            if (!shell.input)
+                continue;
+        }
 		// EOF (Ctrl+D)
 		if (!shell.input)
 		{
