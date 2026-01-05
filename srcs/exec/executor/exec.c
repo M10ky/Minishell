@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 15:27:36 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/05 12:55:52 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/05 14:08:54 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,7 @@ void exec_simple_cmd(t_command *cmd, t_env *env)
         ft_putstr_fd("minishell: ..: command not found\n", 2);
         exit(127);
     }
+
     path = get_path(env, cmd->args[0]);
     if (!path)
     {
