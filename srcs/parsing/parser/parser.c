@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/26 07:45:47 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 22:42:09 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/05 10:55:46 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,31 +15,28 @@
 /**
  * Initialise une nouvelle commande avec toutes les listes à NULL
  */
-static t_command	*init_command(void)
+static t_command *init_command(void)
 {
-	t_command	*command;
+    t_command *command;
 
-	command = malloc(sizeof(t_command));
-	if (!command)
-		return (NULL);
+    command = malloc(sizeof(t_command));
+    if (!command)
+        return (NULL);
 
-	// Initialiser args avec un tableau vide
-	command->args = malloc(sizeof(char *) * 1);
-	if (!command->args)
-	{
-		free(command);
-		return (NULL);
-	}
-	command->args[0] = NULL;
+    command->args = malloc(sizeof(char *) * 1);
+    if (!command->args)
+    {
+        free(command);
+        return (NULL);
+    }
+    command->args[0] = NULL;
 
-	// Initialiser toutes les listes de redirections à NULL
-	command->input_redirection = NULL;
-	command->output_redirection = NULL;
-	command->heredoc = NULL;
-	command->append = NULL;
-	command->next = NULL;
+    command->input_redirection = NULL;
+    command->output_redirection = NULL;  // Liste unique pour > et >>
+    command->heredoc = NULL;
+    command->next = NULL;  // Plus de champ 'append'
 
-	return (command);
+    return (command);
 }
 
 /**

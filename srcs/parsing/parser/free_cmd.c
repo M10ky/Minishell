@@ -6,41 +6,39 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/29 14:31:40 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 22:42:14 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/05 10:58:51 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/parsing.h"
 
-static void	free_cmd(t_command *cmd)
+static void free_cmd(t_command *cmd)
 {
-	int	i;
+    int i;
 
-	if (!cmd)
-		return ;
+    if (!cmd)
+        return;
 
-	if (cmd->args)
-	{
-		i = 0;
-		while (cmd->args[i])
-		{
-			free(cmd->args[i]);
-			i++;
-		}
-		free(cmd->args);
-	}
+    if (cmd->args)
+    {
+        i = 0;
+        while (cmd->args[i])
+        {
+            free(cmd->args[i]);
+            i++;
+        }
+        free(cmd->args);
+    }
 
-	// Libérer toutes les listes de redirections
-	if (cmd->input_redirection)
-		free_redir_list(cmd->input_redirection);
-	if (cmd->output_redirection)
-		free_redir_list(cmd->output_redirection);
-	if (cmd->heredoc)
-		free_redir_list(cmd->heredoc);
-	if (cmd->append)
-		free_redir_list(cmd->append);
+    if (cmd->input_redirection)
+        free_redir_list(cmd->input_redirection);
+    if (cmd->output_redirection)  // Une seule liste maintenant
+        free_redir_list(cmd->output_redirection);
+    if (cmd->heredoc)
+        free_redir_list(cmd->heredoc);
+    // Plus de cmd->append
 
-	free(cmd);
+    free(cmd);
 }
 
 /**

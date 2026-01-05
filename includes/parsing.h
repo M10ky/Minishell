@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:22:34 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 16:43:40 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/05 11:00:36 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,8 @@ void		add_redir_back(t_redir **head, t_redir *new_redir);
 void		free_redir_list(t_redir *redir_list);
 int			count_redir_nodes(t_redir *redir_list);
 t_redir		*get_last_redir(t_redir *redir_list);
+t_redir *create_append_redir_node(char *file);
+
 
 // ========== PARSER ==========
 int			add_argument(t_command *cmd, char *arg);

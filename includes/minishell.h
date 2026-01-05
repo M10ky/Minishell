@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 20:22:34 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 22:29:35 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/05 10:25:10 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,21 +58,20 @@ typedef struct s_token
 
 typedef struct s_redir
 {
-	// t_token_type	*type;
-	char			*file;
-	int				fd;
-	struct s_redir *next;
-}	t_redir;
+    char            *file;
+    int             fd;
+    int             append_mode;  // 0 = >, 1 = >>
+    struct s_redir  *next;
+} t_redir;
 
 typedef struct s_command
 {
-	char				**args;
-	t_redir				*input_redirection; //file an  le redirect_in <
-	t_redir				*output_redirection; //file an  le redirect_out >
-	t_redir				*heredoc; //file an heredoc <<
-	t_redir				*append; //file an  append >>
-	struct s_command	*next;
-}	t_command;
+    char            **args;
+    t_redir         *input_redirection;
+    t_redir         *output_redirection;  // Liste unique pour > et >>
+    t_redir         *heredoc;
+    struct s_command *next;
+} t_command;
 
 typedef struct s_shell
 {
