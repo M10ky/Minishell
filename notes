@@ -1,9 +1,6 @@
 4-bash-5.1$ ls > $fdsg
 bash: $fdsg: ambiguous redirect
 
-5- minishell> exit 5 | exit 6
-exit
-exit
 
 6- cd -; pwd                          # ancien répertoire
 cd --; pwd                         # $HOME
@@ -37,10 +34,10 @@ minishell>
 
 8- minishell> cat | ls
 includes  libft  Makefile  minishell  notes  srcs  testeur
-^Cminishell> 
+^Cminishell>
 
 tarandri@c1r4s14:~/Music/minishell_mioky$ cat | ls
 includes  libft  Makefile  minishell  notes  srcs  testeur
 ^C
-tarandri@c1r4s14:~/Music/minishell_mioky$ 
+tarandri@c1r4s14:~/Music/minishell_mioky$
 
