@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expander.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
+/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/26 07:44:36 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/05 21:59:32 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/06 12:08:56 by tarandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static char	*handle_dollar_expansion(char *str, int *i, char *result,
 	if (str[*i] == '?')
 	{
 		var_value = ft_itoa(shell->last_exit_status);
-		result = str_append_str(result, var_value);  // str_append_str libère result
+		result = str_append_str(result, var_value);
 		free(var_value);
 		(*i)++;
 		return (result);
@@ -33,7 +33,7 @@ static char	*handle_dollar_expansion(char *str, int *i, char *result,
 		var_name = extract_var_name_simple(str, i);
 	else
 	{
-		result = str_append_char(result, '$');  // str_append_char libère result
+		// result = str_append_char(result, '$');
 		return (result);
 	}
 	if (var_name)
@@ -41,59 +41,35 @@ static char	*handle_dollar_expansion(char *str, int *i, char *result,
 		var_value = get_env_value_copy(shell, var_name);
 		if (var_value)
 		{
-			result = str_append_str(result, var_value);  // str_append_str libère result
+			result = str_append_str(result, var_value);
 			free(var_value);
+		}
+		else
+		{
+			result = NULL;
 		}
 		free(var_name);
 	}
 	return (result);
 }
-static int	is_heredoc_delimiter(t_token *tokens, t_token *current)
-{
-	t_token	*prev;
 
-	if (!tokens || !current)
-		return (0);
-
-	prev = tokens;
-
-	// Cas spécial: current est le premier token
-	if (prev == current)
-		return (0);
-
-	// Chercher le token précédent
-	while (prev && prev->next != current)
-		prev = prev->next;
-
-	// Si le token précédent est <<, alors current est un délimiteur
-	if (prev && prev->type == HEREDOC)
-		return (1);
-
-	return (0);
-}
 void	expand_tokens(t_token *tokens, t_shell *shell)
 {
 	t_token	*current;
+	t_token	*prev;
 	char	*expanded;
 
 	current = tokens;
+	prev = NULL;
 	while (current)
 	{
-		// NE PAS expanser les délimiteurs de heredoc
-		if (current->type == WORD && is_heredoc_delimiter(tokens, current))
-		{
-			// Le délimiteur reste tel quel (même avec des $)
-			current = current->next;
-			continue;
-		}
-
-		// Expanser les autres WORD normalement
-		if (current->type == WORD)
+		if (current->type == WORD && (!prev || prev->type != HEREDOC))
 		{
 			expanded = expand_string(current->value, shell);
 			free(current->value);
 			current->value = expanded;
 		}
+		prev = current;
 		current = current->next;
 	}
 }
@@ -109,17 +85,34 @@ char	*expand_string(char *str, t_shell *shell)
 	i = 0;
 	in_single_quote = 0;
 	in_double_quote = 0;
+
 	while (str[i])
 	{
 		if (str[i] == '\'' && !in_double_quote)
 		{
-			in_single_quote = !in_single_quote;
-			i++;
+			if (str[i + 1] == '\'')
+			{
+				result = str_append_char(result, ' ');
+				i += 2;
+			}
+			else
+			{
+				in_single_quote = !in_single_quote;
+				i++;
+			}
 		}
 		else if (str[i] == '"' && !in_single_quote)
 		{
-			in_double_quote = !in_double_quote;
-			i++;
+			if (str[i + 1] == '"')
+			{
+				result = str_append_char(result, ' ');
+				i += 2;
+			}
+			else
+			{
+				in_double_quote = !in_double_quote;
+				i++;
+			}
 		}
 		else if (str[i] == '$' && !in_single_quote)
 			result = handle_dollar_expansion(str, &i, result, shell);
@@ -128,3 +121,4 @@ char	*expand_string(char *str, t_shell *shell)
 	}
 	return (result);
 }
+

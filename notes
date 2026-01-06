@@ -1,14 +1,31 @@
-1-""
-
 4-bash-5.1$ ls > $fdsg
 bash: $fdsg: ambiguous redirect
 
-5-minishell> exit 5 | exit 6
+5- minishell> exit 5 | exit 6
 exit
 exit
 
-6-	cd -
-	cd --
+6- cd -; pwd                          # ancien répertoire
+cd --; pwd                         # $HOME
+
+7- message d'erreur structure error : bash: export: `12invalid=value': not a valid identifier
+
+8-  minishell> echo $"USER''"
+minishell> $USER'' | bash> USER''
+echo "$"USER''"" bash : $USER
+echo soratra$"USER''"
+minishell> soratra$USER'' | bash> soratraUSER''
+
+9 - error message bash-5.1$ echo >
+bash: syntax error near unexpected token `newline'
+
+11 - echo "" '' "''" ?? un quote vide = un espace
+minishell	: ''
+bash		:   ''
+
+13 - echo 'test => deux messages d'erreur
+minishell: syntax error: unclosed quote
+minishell: syntax error near unexpected token `unclosed quote'
 
 7 -
 bash-5.1$ ls << EOF >
@@ -18,10 +35,12 @@ minishell> cat << EOF >
 minishell: syntax error near unexpected token `>'
 minishell>
 
-8-
-bash-5.1$ echo $"USER"
-USER
-minishell> echo $"USER"
-$USER
+8- minishell> cat | ls
+includes  libft  Makefile  minishell  notes  srcs  testeur
+^Cminishell> 
 
+tarandri@c1r4s14:~/Music/minishell_mioky$ cat | ls
+includes  libft  Makefile  minishell  notes  srcs  testeur
+^C
+tarandri@c1r4s14:~/Music/minishell_mioky$ 
 
