@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 15:27:36 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/07 14:35:26 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/07 16:54:13 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,11 +180,13 @@ static void child_process(t_command *cmd, t_shell *shell,
         exit(126);
     }
 }
-static void wait_all_children(pid_t last_pid, t_shell *shell, int has_pipe)
+static void wait_all_children(pid_t last_pid, t_shell *shell)
 {
     pid_t   wpid;
     int     status;
     int     last_status;
+    int     received_sigint = 0;  // Pour savoir si on doit afficher \n
+    int     received_sigquit = 0; // Pour savoir si on doit afficher Quit
 
     last_status = 0;
     signal(SIGINT, SIG_IGN);
@@ -196,31 +198,36 @@ static void wait_all_children(pid_t last_pid, t_shell *shell, int has_pipe)
         if (wpid == -1)
             break;
 
+        // 1. Détecter si UN des enfants a reçu un signal (pour l'affichage)
+        if (WIFSIGNALED(status))
+        {
+            if (WTERMSIG(status) == SIGINT)
+                received_sigint = 1;
+            else if (WTERMSIG(status) == SIGQUIT)
+                received_sigquit = 1;
+        }
+
+        // 2. Sauvegarder le statut SEULEMENT si c'est la dernière commande (pour $?)
         if (wpid == last_pid)
             last_status = status;
     }
 
     setup_prompt_signal();
 
+    // Gestion du code de retour ($?) -> Basé sur last_pid
     if (WIFEXITED(last_status))
         shell->last_exit_status = WEXITSTATUS(last_status);
     else if (WIFSIGNALED(last_status))
-    {
-        int sig = WTERMSIG(last_status);
-        shell->last_exit_status = 128 + sig;
+        shell->last_exit_status = 128 + WTERMSIG(last_status);
 
-        // MODIFICATION: Distinguer commande simple vs pipeline
-        if (sig == SIGINT)  // Ctrl+C
-        {
-            // Afficher newline SEULEMENT si pas de pipe
-            if (!has_pipe)
-                write(1, "\n", 1);
-            // Sinon (pipeline), ne rien afficher
-        }
-        else if (sig == SIGQUIT)  // Ctrl+
-        {
-            ft_putstr_fd("Quit (core dumped)\n", 2);
-        }
+    // Gestion de l'affichage -> Basé sur si N'IMPORTE QUI a reçu un signal
+    if (received_sigint)
+    {
+        write(1, "\n", 1);
+    }
+    else if (received_sigquit)
+    {
+        ft_putstr_fd("Quit (core dumped)\n", 2);
     }
 }
 
@@ -231,14 +238,14 @@ void executor(t_shell *shell)
     int         curr_pipe[2];
     pid_t       pid;
     pid_t       last_pid;
-    int         has_pipe;  // NOUVEAU
+    // int         has_pipe;  // NOUVEAU
 
     prev_pipe[0] = -1;
     prev_pipe[1] = -1;
     cmd = shell->commands;
 
     // NOUVEAU: Détecter si on a un pipeline
-    has_pipe = (cmd && cmd->next) ? 1 : 0;
+    // has_pipe = (cmd && cmd->next) ? 1 : 0;
 
     if (process_heredocs(shell) != 0)
     {
@@ -310,6 +317,6 @@ void executor(t_shell *shell)
     }
 
     // MODIFICATION: Passer has_pipe à wait_all_children
-    wait_all_children(last_pid, shell, has_pipe);
+    wait_all_children(last_pid, shell);
     cleanup_heredocs(shell);
 }

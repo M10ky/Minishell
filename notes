@@ -25,36 +25,6 @@ minishell> cat << EOF >
 minishell: syntax error near unexpected token `>'
 minishell>
 
-8- minishell> cat | ls ITOOOO
-includes  libft  Makefile  minishell  notes  srcs  testeur
-^Cminishell>
-
-tarandri@c1r4s14:~/Music/minishell_mioky$ cat | ls
-includes  libft  Makefile  minishell  notes  srcs  testeur
-^C
-tarandri@c1r4s14:~/Music/minishell_mioky$
-
-
-
-11-ITOOOO
-
-minishell> exit "              5"
-🔍 DEBUG tokenize: word='exit', was_quoted=0
-🔍 DEBUG tokenize: word='"              5"', was_quoted=1
-🔍 DEBUG expand AVANT: value='exit', was_quoted=0
-🔍 DEBUG expand APRES: value='exit', was_quoted=0
-🔍 DEBUG expand AVANT: value='"              5"', was_quoted=1
-🔍 DEBUG expand APRES: value='              5', was_quoted=1
-exit
-minishell: exit:               5: numeric argument required
-
-bash-5.1$ exit "             5"
-exit
-
-c1r4s13% bash  --posix
-bash-5.1$ exit "           5              "
-exit
-
 
 12-
  env -i bash --posix
@@ -67,3 +37,4 @@ bash-5.2$
 bash-5.2$ env -i ./minishell
 minishell> env
 minishell>
+
