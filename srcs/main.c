@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
+/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:33:27 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/07 07:04:23 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/07 09:47:19 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,11 +37,6 @@ int main(int argc, char **argv, char **envp)
 
 	// Duplication de l'environnement
 	shell.env = dup_env(envp);
-	if (!shell.env)
-	{
-		ft_putstr_fd("minishell: error initializing environment\n", 2);
-		return (1);
-	}
 
 	// Configuration des signaux
 	setup_prompt_signal();

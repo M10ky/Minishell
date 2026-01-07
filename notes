@@ -25,7 +25,7 @@ minishell> cat << EOF >
 minishell: syntax error near unexpected token `>'
 minishell>
 
-8- minishell> cat | ls
+8- minishell> cat | ls ITOOOO
 includes  libft  Makefile  minishell  notes  srcs  testeur
 ^Cminishell>
 
@@ -36,7 +36,7 @@ tarandri@c1r4s14:~/Music/minishell_mioky$
 
 
 
-11-
+11-ITOOOO
 
 minishell> exit "              5"
 🔍 DEBUG tokenize: word='exit', was_quoted=0
