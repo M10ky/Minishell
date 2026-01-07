@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 15:27:36 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/06 21:08:23 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/07 14:35:26 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -213,7 +213,7 @@ static void wait_all_children(pid_t last_pid, t_shell *shell, int has_pipe)
         if (sig == SIGINT)  // Ctrl+C
         {
             // Afficher newline SEULEMENT si pas de pipe
-            if (has_pipe)
+            if (!has_pipe)
                 write(1, "\n", 1);
             // Sinon (pipeline), ne rien afficher
         }

@@ -54,3 +54,16 @@ exit
 c1r4s13% bash  --posix
 bash-5.1$ exit "           5              "
 exit
+
+
+12-
+ env -i bash --posix
+bash-5.2$ env
+PWD=/home/mioky/Musique/M10ky
+SHLVL=1
+_=/usr/bin/env
+bash-5.2$
+
+bash-5.2$ env -i ./minishell
+minishell> env
+minishell>
