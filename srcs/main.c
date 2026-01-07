@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:33:27 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/07 09:47:19 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/07 20:57:05 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,8 @@ int main(int argc, char **argv, char **envp)
 		return (1);
 	}
 
-	// Duplication de l'environnement
-	shell.env = dup_env(envp);
+	// ✅ CORRECTION : Utiliser init_env() au lieu de dup_env()
+	init_env(&shell, envp);
 
 	// Configuration des signaux
 	setup_prompt_signal();
@@ -50,14 +50,14 @@ int main(int argc, char **argv, char **envp)
 		shell.input = readline("minishell> ");
 
 		if (g_received_signal == SIGINT)
-        {
-            shell.last_exit_status = 130;
-            g_received_signal = 0;
+		{
+			shell.last_exit_status = 130;
+			g_received_signal = 0;
 
-            // Si readline a retourné NULL après Ctrl+C
-            if (!shell.input)
-                continue;
-        }
+			// Si readline a retourné NULL après Ctrl+C
+			if (!shell.input)
+				continue;
+		}
 		// EOF (Ctrl+D)
 		if (!shell.input)
 		{
@@ -98,7 +98,7 @@ int main(int argc, char **argv, char **envp)
 
 		// Expansion
 		expand_tokens(shell.tokens, &shell);
-		// NOUVEAU: Vérifier les redirections ambiguës AVANT le nettoyage
+		// Vérifier les redirections ambiguës AVANT le nettoyage
 		if (check_ambiguous_redirects(shell.tokens))
 		{
 			shell.last_exit_status = 1;
@@ -157,7 +157,7 @@ int main(int argc, char **argv, char **envp)
 
 	// Nettoyage final
 	if (shell.env)
-		free_env_list(shell.env);
+		free_env(shell.env);  // ✅ Utiliser free_env() au lieu de free_env_list()
 	if (shell.tokens)
 		free_tokens(shell.tokens);
 	if (shell.commands)
