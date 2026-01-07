@@ -6,7 +6,7 @@
 /*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/26 07:44:36 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/07 06:56:11 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/06 16:43:25 by tarandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,7 @@ static char	*handle_dollar_expansion(char *str, int *i, char *result,
 	char	*var_name;
 	char	*var_value;
 
-	(*i)++;  // Passer le '$'
-	
-	// Cas 1: $? - Code de sortie
+	(*i)++;
 	if (str[*i] == '?')
 	{
 		var_value = ft_itoa(shell->last_exit_status);
@@ -29,52 +27,30 @@ static char	*handle_dollar_expansion(char *str, int *i, char *result,
 		(*i)++;
 		return (result);
 	}
-	
-	// Cas 2: ${VAR} - Variable avec accolades
 	if (str[*i] == '{')
-	{
 		var_name = extract_var_name_braces(str, i);
-		if (!var_name)
-		{
-			// Erreur de syntaxe dans ${...} - garder littéral
-			result = str_append_str(result, "${");
-			return (result);
-		}
-		var_value = get_env_value_copy(shell, var_name);
-		if (var_value)
-		{
-			result = str_append_str(result, var_value);
-			free(var_value);
-		}
-		// Si la variable n'existe pas, on ajoute rien (expansion vide)
-		free(var_name);
-		return (result);
-	}
-	
-	// Cas 3: $VAR - Variable simple
-	if (is_valid_var_char(str[*i]))
-	{
+	else if (is_valid_var_char(str[*i]))
 		var_name = extract_var_name_simple(str, i);
-		if (!var_name)
-		{
-			// Cas bizarre, garder le $
-			result = str_append_char(result, '$');
-			return (result);
-		}
+	else
+	{
+		result = str_append_char(result, '$');
+		return (result);
+	}
+	if (var_name)
+	{
 		var_value = get_env_value_copy(shell, var_name);
 		if (var_value)
 		{
 			result = str_append_str(result, var_value);
 			free(var_value);
 		}
-		// Si la variable n'existe pas, on ajoute rien (expansion vide)
+		else
+		{
+			free(var_name);
+			return (result);
+		}
 		free(var_name);
-		return (result);
 	}
-	
-	// Cas 4: $ suivi d'un caractère invalide ou rien
-	// → Garder le $ littéral
-	result = str_append_char(result, '$');
 	return (result);
 }
 
@@ -83,7 +59,6 @@ void	expand_tokens(t_token *tokens, t_shell *shell)
 	t_token	*current;
 	t_token	*prev;
 	char	*expanded;
-	int		original_was_quoted;  // NOUVEAU
 
 	current = tokens;
 	prev = NULL;
@@ -91,17 +66,9 @@ void	expand_tokens(t_token *tokens, t_shell *shell)
 	{
 		if (current->type == WORD && (!prev || prev->type != HEREDOC))
 		{
-			original_was_quoted = current->was_quoted;  // Sauvegarder
-			// DEBUG: AJOUTER CES LIGNES
-			printf("🔍 DEBUG expand AVANT: value='%s', was_quoted=%d\n", 
-			       current->value, current->was_quoted);
 			expanded = expand_string(current->value, shell);
 			free(current->value);
 			current->value = expanded;
-			current->was_quoted = original_was_quoted;  // RESTAURER
-			// DEBUG: AJOUTER CES LIGNES
-			printf("🔍 DEBUG expand APRES: value='%s', was_quoted=%d\n", 
-			       current->value, current->was_quoted);
 		}
 		prev = current;
 		current = current->next;
@@ -124,20 +91,43 @@ char	*expand_string(char *str, t_shell *shell)
 	{
 		if (str[i] == '\'' && !in_double_quote)
 		{
-			in_single_quote = !in_single_quote;
-			i++;
+			if (str[i + 1] == '\'')
+			{
+				// result = str_append_char(result, ' ');
+				i += 2;
+			}
+			else
+			{
+				in_single_quote = !in_single_quote;
+				i++;
+			}
 		}
 		else if (str[i] == '"' && !in_single_quote)
 		{
-			in_double_quote = !in_double_quote;
-			i++;
+			if (str[i + 1] == '"')
+			{
+				result = str_append_char(result, ' ');
+				i += 2;
+			}
+			else
+			{
+				in_double_quote = !in_double_quote;
+				i++;
+			}
 		}
 		else if (str[i] == '$' && !in_single_quote)
+		{
+			char *temp = result;
 			result = handle_dollar_expansion(str, &i, result, shell);
+			if (result == temp)
+			{
+				result = str_append_char(result, '$');
+				i--;
+			}
+		}
 		else
 			result = str_append_char(result, str[i++]);
 	}
 	return (result);
 }
-
 

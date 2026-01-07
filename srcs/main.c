@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
+/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:33:27 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/05 15:23:46 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/07 07:04:23 by tarandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,16 @@ int main(int argc, char **argv, char **envp)
 
 		// Expansion
 		expand_tokens(shell.tokens, &shell);
+		// NOUVEAU: Vérifier les redirections ambiguës AVANT le nettoyage
+		if (check_ambiguous_redirects(shell.tokens))
+		{
+			shell.last_exit_status = 1;
+			free_tokens(shell.tokens);
+			shell.tokens = NULL;
+			free(shell.input);
+			shell.input = NULL;
+			continue;
+		}
 		clean_empty_tokens(&shell.tokens);
 
 		// Si plus de tokens après nettoyage
@@ -117,6 +127,7 @@ int main(int argc, char **argv, char **envp)
 		shell.commands = parse(shell.tokens);
 		if (!shell.commands)
 		{
+			shell.last_exit_status = 1;
 			free_tokens(shell.tokens);
 			shell.tokens = NULL;
 			free(shell.input);

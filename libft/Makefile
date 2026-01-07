@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: miokrako <miokrako@student.42.fr>          +#+  +:+       +#+         #
+#    By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/25 20:31:20 by miokrako          #+#    #+#              #
-#    Updated: 2025/03/31 10:19:28 by miokrako         ###   ########.fr        #
+#    Updated: 2026/01/06 15:54:31 by tarandri         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ OBJS = $(SRCS:.c=.o)
 
 NAME = libft.a
 
-CC = gcc
+CC = cc
 
 CFLAGS = -Wall -Werror -Wextra -I ./
 

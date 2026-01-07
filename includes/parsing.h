@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
+/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:22:34 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/05 11:00:36 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/07 07:03:46 by tarandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int			ft_strcmp(char *s1, char *s2);
 char		*ft_strndup(const char *s, size_t n);
 
 // ========== TOKENIZER ==========
-char		*extract_word(char *s, int *i);
+char		*extract_word(char *s, int *i, int *was_quoted);
 int			check_tokens(t_token *tokens);
 t_token		*create_token(t_token_type type, char *value);
 void		add_token_back(t_token **head, t_token *new);
@@ -61,6 +61,9 @@ int			handle_append_redirection(t_command *cmd, t_token **current);
 int			handle_heredoc(t_command *cmd, t_token **current);
 int			finalize_command(t_command **command_list, t_command **current_cmd);
 t_command	*parse(t_token *tokens);
+int			is_ambiguous_redirect(char *filename, int was_quoted);
+void		print_ambiguous_error(char *filename);
+int			check_ambiguous_redirects(t_token *tokens);
 
 // ========== ENV ==========
 char		*env_get_value(t_env *env_list, char *key);
