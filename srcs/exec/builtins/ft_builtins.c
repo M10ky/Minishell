@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:31:02 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/07 17:39:45 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/07 20:29:38 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,15 +90,6 @@ int	builtin_pwd(void)
 	}
 }
 
-static int	handle_exit_numeric_error(char *arg, t_shell *shell)
-{
-	ft_putstr_fd("minishell: exit: ", 2);
-	ft_putstr_fd(arg, 2);
-	ft_putstr_fd(": numeric argument required\n", 2);
-	cleanup_shell(shell);
-	exit(2);
-}
-
 static int	handle_too_many_args(void)
 {
 	ft_putstr_fd("minishell: exit: too many arguments\n", 2);
@@ -134,6 +125,18 @@ int ft_atoll_safe(const char *str, long long *result)
     *result = res * sign;
     return (0);
 }
+static void	exit_with_error(char *arg, t_shell *shell)
+{
+	ft_putstr_fd("minishell: exit: ", 2);
+	ft_putstr_fd(arg, 2);
+	ft_putstr_fd(": numeric argument required\n", 2);
+
+	if (shell->commands->next)
+		cleanup_child(shell);
+	else
+		cleanup_shell(shell);
+	exit(2);
+}
 
 int	builtin_exit(char **args, t_shell *shell)
 {
@@ -141,24 +144,22 @@ int	builtin_exit(char **args, t_shell *shell)
 
 	if (!shell->commands->next)
 		ft_putstr_fd("exit\n", 2);
-	if (!args[1])
-		exit(shell->last_exit_status);
-	if (!is_valid_exit_arg(args[1]))
+
+	if (args[1])
 	{
-		handle_exit_numeric_error(args[1], shell);
-		if (shell->commands->next)
-		{
-			cleanup_child(shell);
-			exit(2);
-		}
-		cleanup_shell(shell);
-		exit(2);
+		if (!is_valid_exit_arg(args[1]) || ft_atoll_safe(args[1], &exit_code) == -1)
+			exit_with_error(args[1], shell);
+
+		if (args[2])
+			return(handle_too_many_args());
 	}
-	if (ft_atoll_safe(args[1], &exit_code) == -1)
-		handle_exit_numeric_error(args[1], shell);
-	if (args[2])
-		return (handle_too_many_args());
-	cleanup_shell(shell);
+	else
+		exit_code = shell->last_exit_status;
+
+	if (shell->commands->next)
+		cleanup_child(shell);
+	else
+		cleanup_shell(shell);
 	exit(exit_code % 256);
 }
 
