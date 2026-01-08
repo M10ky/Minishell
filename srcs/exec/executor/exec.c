@@ -6,110 +6,103 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 15:27:36 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/08 11:58:29 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/08 14:18:53 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/exec.h"
 
-char *get_path(t_env *env, char *cmd)
+char	*get_path(t_env *env, char *cmd)
 {
-    char    *path_var;
-    char    **paths;
-    char    *full_path;
-    char    *part_path;
-    int     i;
+	char	*path_var;
+	char	**paths;
+	char	*full_path;
+	char	*part_path;
+	int		i;
 
-    if (ft_strchr(cmd, '/'))
-    {
-        // Vérifier si le fichier existe
-        if (access(cmd, F_OK) == -1)
-            return (NULL);  // 127 - command not found
-
-        // Le fichier existe, vérifier les permissions d'exécution
-        if (access(cmd, X_OK) == -1)
-        {
-            // IMPORTANT: Retourner le chemin même sans permission
-            // exec_simple_cmd() gérera l'erreur 126
-            return (ft_strdup(cmd));
-        }
-
-        return (ft_strdup(cmd));
-    }
-    path_var = get_env_value(env, "PATH");
-    if (!path_var)
-        return (NULL);
-    paths = ft_split(path_var, ':');
-    if (!paths)
-        return (NULL);
-    i = 0;
-    while (paths[i])
-    {
-        part_path = ft_strjoin(paths[i], "/");
-        if (!part_path)
-        {
-            free_tab(paths);
-            return (NULL);
-        }
-        full_path = ft_strjoin(part_path, cmd);
-        free(part_path);
-        if (!full_path)
-        {
-            free_tab(paths);
-            return (NULL);
-        }
-        if (access(full_path, F_OK | X_OK) == 0)
-        {
-            free_tab(paths);
-            return (full_path);
-        }
-        free(full_path);
-        i++;
-    }
-    free_tab(paths);
-    return (NULL);
+	if (ft_strchr(cmd, '/'))
+	{
+		if (access(cmd, F_OK) == -1)
+			return (NULL);  // 127 - command not found
+		if (access(cmd, X_OK) == -1)
+		{
+			return (ft_strdup(cmd));
+		}
+		return (ft_strdup(cmd));
+	}
+	path_var = get_env_value(env, "PATH");
+	if (!path_var)
+		return (NULL);
+	paths = ft_split(path_var, ':');
+	if (!paths)
+		return (NULL);
+	i = 0;
+	while (paths[i])
+	{
+		part_path = ft_strjoin(paths[i], "/");
+		if (!part_path)
+		{
+			free_tab(paths);
+			return (NULL);
+		}
+		full_path = ft_strjoin(part_path, cmd);
+		free(part_path);
+		if (!full_path)
+		{
+			free_tab(paths);
+			return (NULL);
+		}
+		if (access(full_path, F_OK | X_OK) == 0)
+		{
+			free_tab(paths);
+			return (full_path);
+		}
+		free(full_path);
+		i++;
+	}
+	free_tab(paths);
+	return (NULL);
 }
 
-void exec_simple_cmd(t_command *cmd, t_env *env)
+void	exec_simple_cmd(t_command *cmd, t_env *env)
 {
-    char    *path;
-    char    **env_tab;
-    struct stat path_stat;
+	char		*path;
+	char		**env_tab;
+	struct stat	path_stat;
 
-    if (!cmd || !cmd->args || !cmd->args[0])
-        exit(0);
-    if (ft_strcmp(cmd->args[0], ".") == 0)
-    {
-        ft_putstr_fd("minishell: .: filename argument required\n", 2);
-        exit(2);
-    }
-    if (ft_strcmp(cmd->args[0], "..") == 0)
-    {
-        ft_putstr_fd("minishell: ..: command not found\n", 2);
-        exit(127);
-    }
-
-    path = get_path(env, cmd->args[0]);
-    if (!path)
-    {
-        ft_putstr_fd("minishell: ", 2);
-        ft_putstr_fd(cmd->args[0], 2);
-        ft_putstr_fd(": command not found\n", 2);
-        exit(127);
-    }
-    if (stat(path, &path_stat) == 0 && S_ISDIR(path_stat.st_mode))
-    {
-        ft_putstr_fd("minishell: ", 2);
-        ft_putstr_fd(cmd->args[0], 2);
-        ft_putstr_fd(": is a directory\n", 2);
-        free(path);
-        exit(126);
-    }
-    if (access(path, X_OK) == -1)
-    {
-        ft_putstr_fd("minishell: ", 2);
-        ft_putstr_fd(cmd->args[0], 2);
-        ft_putstr_fd(": Permission denied\n", 2);
+	if (!cmd || !cmd->args || !cmd->args[0])
+		exit(0);
+	if (ft_strcmp(cmd->args[0], ".") == 0)
+	{
+		ft_putstr_fd("minishell: .: filename argument required\n", 2);
+		exit(2);
+	}
+	if (ft_strcmp(cmd->args[0], "..") == 0)
+	{
+		ft_putstr_fd("minishell: ..: command not found\n", 2);
+		exit(127);
+	}
+	path = get_path(env, cmd->args[0]);
+	if (!path)
+	{
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(cmd->args[0], 2);
+		ft_putstr_fd(": command not found\n", 2);
+		exit(127);
+	}
+	if (stat(path, &path_stat) == 0 && S_ISDIR(path_stat.st_mode))
+	{
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(cmd->args[0], 2);
+		ft_putstr_fd(": is a directory\n", 2);
+		free(path);
+		exit(126);
+	}
+	if (access(path, X_OK) == -1)
+	{
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(cmd->args[0], 2);
+		ft_putstr_fd(": Permission denied\n", 2);
         free(path);
         exit(126);  // Permission denied
     }
