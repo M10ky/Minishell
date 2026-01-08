@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:33:27 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/07 20:57:05 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/08 11:55:57 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ int main(int argc, char **argv, char **envp)
 		}
 
 		// Vérification commande valide
-		if (shell.commands->args && shell.commands->args[0])
+		if (shell.commands->args)
 		{
 			// Exécution
 			executor(&shell);

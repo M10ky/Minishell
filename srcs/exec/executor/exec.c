@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 15:27:36 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/07 16:54:13 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/08 11:58:29 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,6 +166,12 @@ static void child_process(t_command *cmd, t_shell *shell,
     {
         cleanup_child(shell);
         exit(1);
+    }
+    if (!cmd->args || !cmd->args[0])
+    {
+        // Commande vide : les redirections ont été faites, on quitte proprement
+        cleanup_child(shell);
+        exit(0);
     }
     if (is_builtin(cmd->args[0]))
     {
