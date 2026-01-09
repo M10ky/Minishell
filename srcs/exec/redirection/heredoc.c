@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 15:45:17 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/08 14:05:49 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/08 16:00:35 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,6 @@ int	create_heredoc_file(char *delimiter, char *filename)
 	}
 	setup_heredoc_signals();
 	g_received_signal = 0;
-
 	while (1)
 	{
 		if (g_received_signal == SIGINT)
@@ -219,7 +218,6 @@ static void	replace_heredoc_file(char *tmpfile)
 	final_file = ft_strjoin(tmpfile, ".final");
 	if (!final_file)
 		return ;
-
 	fd_in = open(final_file, O_RDONLY);
 	fd_final = open(tmpfile, O_WRONLY | O_TRUNC);
 	if (fd_in != -1 && fd_final != -1)
@@ -241,7 +239,6 @@ static void	expand_heredoc_content(t_shell *shell, char *tmpfile)
 	final_file = ft_strjoin(tmpfile, ".final");
 	if (!final_file)
 		return ;
-
 	fd_in = open(tmpfile, O_RDONLY);
 	fd_out = open(final_file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (fd_in != -1 && fd_out != -1)
@@ -266,7 +263,7 @@ static void	expand_heredoc_content(t_shell *shell, char *tmpfile)
 /* ========================================================================== */
 
 static int	child_heredoc_process(char *clean_delim, char *tmpfile,
-								int do_expand, t_shell *shell)
+		int do_expand, t_shell *shell)
 {
 	if (create_heredoc_file(clean_delim, tmpfile) == -1)
 	{
@@ -341,7 +338,7 @@ static char	*generate_tmpfile_name(char *delimiter, int index)
 }
 
 static int	process_single_heredoc_node(t_redir *heredoc_node, t_shell *shell,
-											int index)
+		int index)
 {
 	int		do_expand;
 	char	*clean_delim;

@@ -6,12 +6,11 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/04 22:41:18 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 22:23:27 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/08 16:00:22 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/exec.h"
-
 
 static int	is_valid_identifier(const char *str)
 {

@@ -1,17 +1,11 @@
-6- cd -; pwd                          # ancien répertoire
-cd --; pwd                         # $HOME
-
 7- message d'erreur structure error : bash: export: `12invalid=value': not a valid identifier
 
-8-  minishell> echo $"USER''"
-minishell> $USER'' | bash> USER''
-echo "$"USER''"" bash : $USER
-echo soratra$"USER''"
-minishell> soratra$USER'' | bash> soratraUSER''
-
-9 - error message bash-5.1$ echo >
+mitovy - error message bash-5.1$ echo >
 bash: syntax error near unexpected token `newline'
 
+~/Downloads/minishell$  << m > | << l > l
+mitovy bash: syntax error near unexpected token `|'
+> m
 
 13 - echo 'test => deux messages d'erreur
 minishell: syntax error: unclosed quote
@@ -25,4 +19,9 @@ minishell> cat << EOF >
 minishell: syntax error near unexpected token `>'
 minishell>
 
+------------
+PARSING >>> pipeline : lexer > parser > expand > globing > argv[] > exec
+ dans expand : (t_command
+	if
+ 	+++ Word split
 

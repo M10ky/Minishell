@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:31:02 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/07 20:29:38 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/08 15:59:25 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,42 +95,41 @@ static int	handle_too_many_args(void)
 	ft_putstr_fd("minishell: exit: too many arguments\n", 2);
 	return (1);
 }
-int ft_atoll_safe(const char *str, long long *result)
+int	ft_atoll_safe(const char *str, long long *result)
 {
-    unsigned long long  res;
-    int                 sign;
-    int                 i;
+	unsigned long long	res;
+	int					sign;
+	int					i;
 
-    res = 0;
-    sign = 1;
-    i = 0;
-    while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
-        i++;
-    if (str[i] == '-' || str[i] == '+')
-    {
-        if (str[i++] == '-')
-            sign = -1;
-    }
-    while (str[i] >= '0' && str[i] <= '9')
-    {
-        if (sign == 1 && (res > LLONG_MAX / 10 ||
-            (res == LLONG_MAX / 10 && (str[i] - '0') > LLONG_MAX % 10)))
-            return (-1);
-        if (sign == -1 && (res > (unsigned long long)LLONG_MAX + 1 / 10 ||
-            (res == ((unsigned long long)LLONG_MAX + 1) / 10 && (str[i] - '0') > 8)))
-            return (-1);
-
-        res = res * 10 + (str[i++] - '0');
-    }
-    *result = res * sign;
-    return (0);
+	res = 0;
+	sign = 1;
+	i = 0;
+	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
+		i++;
+	if (str[i] == '-' || str[i] == '+')
+	{
+		if (str[i++] == '-')
+			sign = -1;
+	}
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		if (sign == 1 && (res > LLONG_MAX / 10 || (res == LLONG_MAX / 10
+					&& (str[i] - '0') > LLONG_MAX % 10)))
+			return (-1);
+		if (sign == -1 && (res > (unsigned long long)LLONG_MAX + 1 / 10
+				|| (res == ((unsigned long long)LLONG_MAX + 1) / 10 && (str[i]
+						- '0') > 8)))
+			return (-1);
+		res = res * 10 + (str[i++] - '0');
+	}
+	*result = res * sign;
+	return (0);
 }
 static void	exit_with_error(char *arg, t_shell *shell)
 {
 	ft_putstr_fd("minishell: exit: ", 2);
 	ft_putstr_fd(arg, 2);
 	ft_putstr_fd(": numeric argument required\n", 2);
-
 	if (shell->commands->next)
 		cleanup_child(shell);
 	else
@@ -144,25 +143,22 @@ int	builtin_exit(char **args, t_shell *shell)
 
 	if (!shell->commands->next)
 		ft_putstr_fd("exit\n", 2);
-
 	if (args[1])
 	{
-		if (!is_valid_exit_arg(args[1]) || ft_atoll_safe(args[1], &exit_code) == -1)
+		if (!is_valid_exit_arg(args[1]) || ft_atoll_safe(args[1], &exit_code) ==
+			-1)
 			exit_with_error(args[1], shell);
-
 		if (args[2])
-			return(handle_too_many_args());
+			return (handle_too_many_args());
 	}
 	else
 		exit_code = shell->last_exit_status;
-
 	if (shell->commands->next)
 		cleanup_child(shell);
 	else
 		cleanup_shell(shell);
 	exit(exit_code % 256);
 }
-
 
 int	builtin_env(t_env *env)
 {
@@ -214,7 +210,7 @@ int	builtin_cd(char **args, t_env *env)
 	if (args[2])
 	{
 		ft_putstr_fd("minishell: cd: too many arguments\n", 2);
-		return(1);
+		return (1);
 	}
 	if (!old_pwd)
 	{

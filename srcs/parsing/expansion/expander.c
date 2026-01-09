@@ -3,23 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   expander.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
+/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/26 07:44:36 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/07 06:56:11 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/08 16:48:16 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/parsing.h"
 
 static char	*handle_dollar_expansion(char *str, int *i, char *result,
-				t_shell *shell)
+				t_shell *shell, int in_dq)
 {
 	char	*var_name;
 	char	*var_value;
 
 	(*i)++;  // Passer le '$'
-	
+
 	// Cas 1: $? - Code de sortie
 	if (str[*i] == '?')
 	{
@@ -29,7 +29,8 @@ static char	*handle_dollar_expansion(char *str, int *i, char *result,
 		(*i)++;
 		return (result);
 	}
-	
+	if ((str[*i] == '"' || str[*i]=='\'') && !in_dq)
+		return (result);
 	// Cas 2: ${VAR} - Variable avec accolades
 	if (str[*i] == '{')
 	{
@@ -50,7 +51,7 @@ static char	*handle_dollar_expansion(char *str, int *i, char *result,
 		free(var_name);
 		return (result);
 	}
-	
+
 	// Cas 3: $VAR - Variable simple
 	if (is_valid_var_char(str[*i]))
 	{
@@ -71,7 +72,7 @@ static char	*handle_dollar_expansion(char *str, int *i, char *result,
 		free(var_name);
 		return (result);
 	}
-	
+
 	// Cas 4: $ suivi d'un caractère invalide ou rien
 	// → Garder le $ littéral
 	result = str_append_char(result, '$');
@@ -93,15 +94,15 @@ void	expand_tokens(t_token *tokens, t_shell *shell)
 		{
 			original_was_quoted = current->was_quoted;  // Sauvegarder
 			// DEBUG: AJOUTER CES LIGNES
-			printf("🔍 DEBUG expand AVANT: value='%s', was_quoted=%d\n", 
-			       current->value, current->was_quoted);
+			// printf("🔍 DEBUG expand AVANT: value='%s', was_quoted=%d\n",
+			    //    current->value, current->was_quoted);
 			expanded = expand_string(current->value, shell);
 			free(current->value);
 			current->value = expanded;
 			current->was_quoted = original_was_quoted;  // RESTAURER
 			// DEBUG: AJOUTER CES LIGNES
-			printf("🔍 DEBUG expand APRES: value='%s', was_quoted=%d\n", 
-			       current->value, current->was_quoted);
+			// printf("🔍 DEBUG expand APRES: value='%s', was_quoted=%d\n",
+			    //    current->value, current->was_quoted);
 		}
 		prev = current;
 		current = current->next;
@@ -133,7 +134,7 @@ char	*expand_string(char *str, t_shell *shell)
 			i++;
 		}
 		else if (str[i] == '$' && !in_single_quote)
-			result = handle_dollar_expansion(str, &i, result, shell);
+			result = handle_dollar_expansion(str, &i, result, shell, in_double_quote);
 		else
 			result = str_append_char(result, str[i++]);
 	}

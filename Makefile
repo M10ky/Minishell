@@ -1,6 +1,6 @@
 NAME = minishell
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g3
+CFLAGS = -Wall -Wextra -Werror -g
 RM = rm -rf
 
 SRCS =  srcs/main.c \
@@ -26,6 +26,8 @@ SRCS =  srcs/main.c \
 		srcs/parsing/env/env_duplicate.c \
 		srcs/parsing/env/env_to_array.c \
 		srcs/exec/executor/exec.c \
+		srcs/exec/executor/exec_child.c \
+		srcs/exec/executor/exec_cmd.c \
 		srcs/exec/builtins/builtins.c\
 		srcs/exec/builtins/ft_builtins.c\
 		srcs/exec/redirection/handle_redirection.c \

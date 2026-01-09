@@ -6,12 +6,11 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/04 22:37:54 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/02 14:03:47 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/08 16:00:16 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/exec.h"
-
 
 static t_env	*exp_create_env_node(const char *key, const char *value)
 {
@@ -20,7 +19,7 @@ static t_env	*exp_create_env_node(const char *key, const char *value)
 	new_node = (t_env *)malloc(sizeof(t_env));
 	if (!new_node)
 		return (NULL);
-	new_node->key = ft_strdup(key); // mbola ovaina ft_strdup
+	new_node->key = ft_strdup(key);
 	if (value != NULL)
 		new_node->value = strdup(value);
 	else
@@ -138,6 +137,8 @@ int	ft_export(t_shell *shell, char **args)
 			update_or_add_env(shell, key, value);
 			free(value);
 		}
+		else
+			update_or_add_env(shell, key, NULL);
 		free(key);
 		i++;
 	}

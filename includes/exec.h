@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 11:01:22 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/05 10:26:32 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/08 20:19:59 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@
 # include "parsing.h"
 
 // ========== PATH & EXECUTION ==========
+
+void	child_process(t_command *cmd, t_shell *shell, int prev[2], int curr[2]);
+void	wait_all_children(pid_t last_pid, t_shell *shell);
 char	*get_path(t_env *env, char *cmd);
 void	exec_simple_cmd(t_command *cmd, t_env *env);
 void	executor(t_shell *shell);

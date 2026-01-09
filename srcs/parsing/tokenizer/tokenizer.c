@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
+/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:25:06 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/07 06:54:48 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/08 16:48:26 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ t_token	*tokenize(char *input)
 				return (NULL);
 			}
 			new_token->was_quoted = was_quoted;  // NOUVEAU: setter le flag
-			printf("🔍 DEBUG tokenize: word='%s', was_quoted=%d\n", word, was_quoted);
+			// printf("🔍 DEBUG tokenize: word='%s', was_quoted=%d\n", word, was_quoted);
 			add_token_back(&tokens, new_token);
 		}
 	}
