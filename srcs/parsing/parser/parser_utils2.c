@@ -1,28 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tokenizer_utils.c                                  :+:      :+:    :+:   */
+/*   parser_utils2.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/18 21:19:16 by tarandri          #+#    #+#             */
-/*   Updated: 2025/12/26 07:23:10 by tarandri         ###   ########.fr       */
+/*   Created: 2025/12/29 14:57:18 by tarandri          #+#    #+#             */
+/*   Updated: 2026/01/09 00:04:52 by tarandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/parsing.h"
 
-int	ft_isspace(char c)
+void	free_commands(t_command *commands)
 {
-	return (c == ' ' || c == '\t');
+	t_command	*tmp;
+
+	while (commands)
+	{
+		tmp = commands;
+		commands = commands->next;
+		free_command(tmp);
+	}
 }
 
-int	is_operator(char c)
+int	count_args(t_command *cmd)
 {
-	return (c == '|' || c == '<' || c == '>');
-}
+	int		count;
+	t_arg	*current;
 
-int	is_quote(char c)
-{
-	return (c == '\'' || c == '\"');
+	if (!cmd || !cmd->args)
+		return (0);
+	count = 0;
+	current = cmd->args;
+	while (current && current->value)
+	{
+		count++;
+		current++;
+	}
+	return (count);
 }
