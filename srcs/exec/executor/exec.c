@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 20:14:46 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/08 20:14:52 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/09 06:38:52 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,8 @@ static void	handle_parent_pipes(t_command *cmd, int prev[2], int curr[2])
 	if (prev[0] != -1)
 	{
 		close(prev[0]);
-		close(prev[1]);
+		if (prev[1] != -1)
+			close(prev[1]);
 	}
 	if (cmd->next)
 	{

@@ -6,13 +6,13 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/29 14:31:40 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/05 10:58:51 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/09 06:41:14 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/parsing.h"
 
-static void free_cmd(t_command *cmd)
+void free_cmd(t_command *cmd)
 {
     int i;
 

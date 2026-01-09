@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 13:28:19 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/08 14:03:34 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/09 06:53:12 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,26 +26,26 @@ void	free_env(t_env *env)
 	}
 }
 
-void	free_command(t_command *cmd)
-{
-	int	i;
+// void	free_command(t_command *cmd)
+// {
+// 	int	i;
 
-	if (cmd->args)
-	{
-		i = 0;
-		while (cmd->args[i])
-		{
-			free(cmd->args[i]);
-			i++;
-		}
-		free(cmd->args);
-	}
-	if (cmd->input_redirection)
-		free(cmd->input_redirection);
-	if (cmd->output_redirection)
-		free(cmd->output_redirection);
-	free(cmd);
-}
+// 	if (cmd->args)
+// 	{
+// 		i = 0;
+// 		while (cmd->args[i])
+// 		{
+// 			free(cmd->args[i]);
+// 			i++;
+// 		}
+// 		free(cmd->args);
+// 	}
+// 	if (cmd->input_redirection)
+// 		free(cmd->input_redirection);
+// 	if (cmd->output_redirection)
+// 		free(cmd->output_redirection);
+// 	free(cmd);
+// }
 
 void	free_commands(t_command *commands)
 {
@@ -54,7 +54,7 @@ void	free_commands(t_command *commands)
 	while (commands)
 	{
 		tmp = commands->next;
-		free_command(commands);
+		free_cmd(commands);
 		commands = tmp;
 	}
 }
@@ -95,10 +95,30 @@ void	free_tab(char **tab)
 	free(tab);
 }
 
+// void	cleanup_child(t_shell *shell)
+// {
+// 	if (shell->env)
+// 		free_env(shell->env);
+// 	if (shell->commands)
+// 		free_commands(shell->commands);
+// }
 void	cleanup_child(t_shell *shell)
 {
+	// ✅ Libérer l'environnement
 	if (shell->env)
 		free_env(shell->env);
+
+	// ✅ Libérer les commandes
 	if (shell->commands)
 		free_commands(shell->commands);
+
+	// ✅ NOUVEAU : Libérer les tokens
+	if (shell->tokens)
+		free_tokens(shell->tokens);
+
+	// ✅ NOUVEAU : Libérer l'input
+	if (shell->input)
+		free(shell->input);
+
+	// Note: On ne fait PAS rl_clear_history() car c'est un fils
 }

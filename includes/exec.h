@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 11:01:22 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/08 20:19:59 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/09 06:40:54 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ void	setup_heredoc_signals(void);
 void	free_tab(char **tab);
 void	free_tab_partial(char **tab, int count);
 void	free_env(t_env *env);
-void	free_command(t_command *cmd);
+// void	free_command(t_command *cmd);
 void	free_commands(t_command *commands);
 void	cleanup_shell(t_shell *shell);
 void	cleanup_child(t_shell *shell);

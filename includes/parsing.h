@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
+/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:22:34 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/07 07:03:46 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/09 06:40:28 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,5 +73,8 @@ void		add_env_node_back(t_env **head, t_env *new_node);
 t_env		*dup_env(char **envp);
 char		**env_to_array(t_env *env);
 void		free_env_array(char **env_array);
+
+void free_cmd(t_command *cmd);
+
 
 #endif
