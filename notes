@@ -25,4 +25,46 @@ PARSING >>> pipeline : lexer > parser > expand > globing > argv[] > exec
 	if
  	+++ Word split
 
+--leaks
 cd maina
+heredoc
+
+1-
+
+analysez ce comportement de mon minishell par rapport au vrai bash, expliquez moi pourquoi et comment le resoudre
+
+minishell> ls > $re
+minishell: $re: ambiguous redirect
+minishell> echo $?
+0
+minishell> ls
+'$re'	    libft      minishell   readline.supp   save
+ includes   Makefile   notes	   rl.supp	   srcs
+minishell>
+
+mioky@mioky-GL552JX:~/Musique/M10ky$ ls > $re
+bash: $re : redirection ambiguë
+mioky@mioky-GL552JX:~/Musique/M10ky$ echo $?
+1
+mioky@mioky-GL552JX:~/Musique/M10ky$ ls
+includes  libft  Makefile  minishell  notes  readline.supp  rl.supp  save  srcs
+mioky@mioky-GL552JX:~/Musique/M10ky$
+
+2-
+minishell> > 1
+minishell> ls
+includes  libft  Makefile  minishell  notes  readline.supp  rl.supp  save  srcs
+minishell>
+
+bash-5.2$ > 1
+bash-5.2$ ls
+1  includes	libft  Makefile  minishell  notes  readline.supp  rl.supp  save  srcs
+bash-5.2$
+
+3-
+minishell> cd
+minishell: cd: too many arguments
+minishell> cd
+minishell> cd
+
+
