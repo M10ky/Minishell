@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:33:27 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/09 11:51:46 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/09 16:48:46 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,8 +82,8 @@ int	main(int argc, char **argv, char **envp)
 			continue ;
 		}
 		expander(shell.commands, shell.env, shell.last_exit_status);
-		if (shell.commands->args)
-			executor(&shell);
+		// if (shell.commands->args)
+		executor(&shell);
 		if (shell.tokens)
 		{
 			free_tokens(shell.tokens);

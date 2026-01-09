@@ -29,10 +29,7 @@ PARSING >>> pipeline : lexer > parser > expand > globing > argv[] > exec
 cd maina
 heredoc
 
-1-
-
-analysez ce comportement de mon minishell par rapport au vrai bash, expliquez moi pourquoi et comment le resoudre
-
+1-otrany efa vitanla 9janvier
 minishell> ls > $re
 minishell: $re: ambiguous redirect
 minishell> echo $?
@@ -50,7 +47,8 @@ mioky@mioky-GL552JX:~/Musique/M10ky$ ls
 includes  libft  Makefile  minishell  notes  readline.supp  rl.supp  save  srcs
 mioky@mioky-GL552JX:~/Musique/M10ky$
 
-2-
+2- VITA
+fafana fotsiny if (shell.commands->args)  anaty main.c
 minishell> > 1
 minishell> ls
 includes  libft  Makefile  minishell  notes  readline.supp  rl.supp  save  srcs
@@ -61,7 +59,7 @@ bash-5.2$ ls
 1  includes	libft  Makefile  minishell  notes  readline.supp  rl.supp  save  srcs
 bash-5.2$
 
-3-
+3- VITA
 minishell> cd
 minishell: cd: too many arguments
 minishell> cd

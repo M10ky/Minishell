@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/17 21:32:09 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/09 12:11:15 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/09 16:57:58 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,14 +58,24 @@ static char	**convert_args_for_builtins(t_arg *args)
 	int		count;
 	int		i;
 
+	/* MODIFICATION : Retourner un tableau vide au lieu de NULL */
 	if (!args)
-		return (NULL);
+	{
+		result = (char **)malloc(sizeof(char *) * 1);
+		if (!result)
+			return (NULL);
+		result[0] = NULL;
+		return (result);
+	}
+
 	count = 0;
 	while (args[count].value)
 		count++;
+
 	result = (char **)malloc(sizeof(char *) * (count + 1));
 	if (!result)
 		return (NULL);
+
 	i = 0;
 	while (i < count)
 	{

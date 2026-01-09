@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:31:02 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/09 09:30:04 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/09 16:59:34 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,26 +207,33 @@ int	builtin_cd(char **args, t_env *env)
 	char	*old_pwd;
 
 	old_pwd = getcwd(NULL, 0);
-	if (args[2])
+
+	/* CORRECTION : Vérifier args != NULL avant d'accéder aux éléments */
+	if (args && args[1] && args[2])
 	{
 		ft_putstr_fd("minishell: cd: too many arguments\n", 2);
+		free(old_pwd);  // Ne pas oublier de libérer !
 		return (1);
 	}
+
 	if (!old_pwd)
 	{
 		perror("minishell: cd: getcwd");
 		return (1);
 	}
-	if (args[1])
-		dir = args[1];
-	else
-	{
+
+	/* args peut être NULL ou args[1] peut être NULL */
+	if (!args || !args[1])
 		dir = get_env_value(env, "HOME");
-		if (!dir)
-			return (cd_error_no_home(old_pwd));
-	}
+	else
+		dir = args[1];
+
+	if (!dir)
+		return (cd_error_no_home(old_pwd));
+
 	if (chdir(dir) != 0)
 		return (cd_error_chdir(dir, old_pwd));
+
 	update_pwd_vars(env, old_pwd);
 	free(old_pwd);
 	return (0);
