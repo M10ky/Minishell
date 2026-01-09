@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 10:49:05 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/08 13:59:33 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/09 12:04:04 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,18 +190,6 @@ void	init_env(t_shell *shell, char **envp)
 	init_underscore(&shell->env);
 }
 
-char	*get_env_value(t_env *env, char *key)
-{
-	if (!env || !key)
-		return (NULL);
-	while (env)
-	{
-		if (ft_strcmp(env->key, key) == 0)
-			return (env->value);
-		env = env->next;
-	}
-	return (NULL);
-}
 
 int	count_env_vars(t_env *env)
 {

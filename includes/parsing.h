@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
+/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:22:34 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/09 00:44:14 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/09 12:07:30 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 // UTILS
 int			ft_strcmp(char *s1, char *s2);
 char		*ft_strndup(const char *s, size_t n);
+void		ft_error(char *str);
 
 // ENV
 char		*env_get_value(t_env *env_list, char *key);
@@ -27,7 +28,6 @@ void		add_env_node_back(t_env **head, t_env *new_node);
 t_env		*dup_env(char **envp);
 char		**env_to_array(t_env *env);
 void		free_env_array(char **env_array);
-
 
 // LEXER
 t_token		*lexer(char *input);
@@ -50,6 +50,7 @@ t_command	*new_command(void);
 int			parse_simple_command(t_token **tokens, t_command *cmd);
 void		append_command(t_command **cmds, t_command *new_cmd);
 int			syntax_error(char *token);
+int			validate_tokens(t_token *tokens);
 void		free_commands(t_command *commands);
 void		free_command(t_command *cmd);
 void		free_redirections(t_redir *redir);
@@ -72,7 +73,7 @@ void		expand_command(t_command *cmd, t_env *env, int last_exit_status);
 void		expand_args(t_command *cmd, t_env *env, int last_exit_status);
 void		expand_redirections(t_command *cmd, t_env *env, int exit_status);
 char		*expand_variables(char *str, t_env *env, int last_exit_status);
-char		*get_env_value(char *key, t_env *env);
+char		*get_env_value(t_env *env, char *key);
 char		*expand_exit_status(int status);
 int			is_valid_var_char(char c);
 char		**word_split(char *str, t_env *env);

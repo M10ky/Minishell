@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 20:13:41 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/08 20:13:46 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/09 11:43:31 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,35 @@ static void	setup_pipes(t_command *cmd, int prev_pipe[2], int curr_pipe[2])
 	}
 }
 
+// Helper function to convert t_arg array to char** array
+static char	**convert_args_to_array(t_arg *args)
+{
+	char	**result;
+	int		count;
+	int		i;
+
+	if (!args)
+		return (NULL);
+	count = 0;
+	while (args[count].value)
+		count++;
+	result = (char **)malloc(sizeof(char *) * (count + 1));
+	if (!result)
+		return (NULL);
+	i = 0;
+	while (i < count)
+	{
+		result[i] = args[i].value;
+		i++;
+	}
+	result[i] = NULL;
+	return (result);
+}
+
 void	child_process(t_command *cmd, t_shell *shell, int prev[2], int curr[2])
 {
-	int	ret;
+	int		ret;
+	char	**args_array;
 
 	setup_child_signals();
 	setup_pipes(cmd, prev, curr);
@@ -44,12 +70,12 @@ void	child_process(t_command *cmd, t_shell *shell, int prev[2], int curr[2])
 		cleanup_child(shell);
 		exit(1);
 	}
-	if (!cmd->args || !cmd->args[0])
+	if (!cmd->args || !cmd->args[0].value)
 	{
 		cleanup_child(shell);
 		exit(0);
 	}
-	if (is_builtin(cmd->args[0]))
+	if (is_builtin(cmd->args[0].value))
 	{
 		ret = execute_builtin(cmd, shell);
 		cleanup_child(shell);
@@ -57,7 +83,14 @@ void	child_process(t_command *cmd, t_shell *shell, int prev[2], int curr[2])
 	}
 	else
 	{
-		exec_simple_cmd(cmd, shell->env);
+		args_array = convert_args_to_array(cmd->args);
+		if (!args_array)
+		{
+			cleanup_child(shell);
+			exit(1);
+		}
+		exec_simple_cmd_with_array(cmd, shell->env, args_array);
+		free(args_array);
 		cleanup_child(shell);
 		exit(126);
 	}

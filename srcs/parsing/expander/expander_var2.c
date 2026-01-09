@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expander_var2.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
+/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/26 10:01:54 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/09 00:30:56 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/09 12:08:30 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ static char	*handle_dollar(char *str, int *i, t_env *env, int exit_status)
 	var_name = extract_var_name(str, i);
 	if (!var_name)
 		return (ft_strdup(""));
-	value = get_env_value(var_name, env);
+	value = get_env_value(env, var_name);
 	free(var_name);
 	if (!value)
 		return (ft_strdup(""));

@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 20:14:46 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/09 06:38:52 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/09 11:45:04 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,8 +109,8 @@ void	executor(t_shell *shell)
 	cmd = shell->commands;
 	if (process_heredocs(shell) != 0)
 		return ;
-	if (cmd && !cmd->next && cmd->args && cmd->args[0]
-		&& check_parent_builtin(cmd->args[0], shell))
+	if (cmd && !cmd->next && cmd->args && cmd->args[0].value
+		&& check_parent_builtin(cmd->args[0].value, shell))
 	{
 		exec_builtin_parent(cmd, shell);
 		cleanup_heredocs(shell);

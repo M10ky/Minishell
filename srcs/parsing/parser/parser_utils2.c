@@ -3,26 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   parser_utils2.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
+/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/29 14:57:18 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/09 00:04:52 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/09 12:13:31 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/parsing.h"
 
-void	free_commands(t_command *commands)
-{
-	t_command	*tmp;
+// void	free_commands(t_command *commands)
+// {
+// 	t_command	*tmp;
 
-	while (commands)
-	{
-		tmp = commands;
-		commands = commands->next;
-		free_command(tmp);
-	}
-}
+// 	while (commands)
+// 	{
+// 		tmp = commands;
+// 		commands = commands->next;
+// 		free_command(tmp);
+// 	}
+// }
 
 int	count_args(t_command *cmd)
 {

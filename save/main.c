@@ -6,72 +6,120 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:33:27 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/09 11:51:46 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/09 11:48:33 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/exec.h"
 
-int	g_received_signal = 0;
+int g_received_signal = 0;
 
-int	main(int argc, char **argv, char **envp)
+int main(int argc, char **argv, char **envp)
 {
 	t_shell	shell;
 
 	(void)argc;
 	(void)argv;
+
+	// Initialisation complète à NULL/0
 	shell.input = NULL;
 	shell.env = NULL;
 	shell.tokens = NULL;
 	shell.commands = NULL;
 	shell.last_exit_status = 0;
+
+	// Vérification de base
 	if (!envp)
 	{
 		ft_putstr_fd("minishell: invalid environment\n", 2);
 		return (1);
 	}
+
+	// ✅ CORRECTION : Utiliser init_env() au lieu de dup_env()
 	init_env(&shell, envp);
+
+	// Configuration des signaux
 	setup_prompt_signal();
+
+	// Boucle principale
 	while (1)
 	{
 		g_received_signal = 0;
+
+		// Lecture de l'entrée
 		shell.input = readline("minishell> ");
+
 		if (g_received_signal == SIGINT)
 		{
 			shell.last_exit_status = 130;
 			g_received_signal = 0;
+
+			// Si readline a retourné NULL après Ctrl+C
 			if (!shell.input)
-				continue ;
+				continue;
 		}
+		// EOF (Ctrl+D)
 		if (!shell.input)
 		{
 			ft_putstr_fd("exit\n", 2);
-			break ;
+			break;
 		}
+
+		// Ligne vide
 		if (shell.input[0] == '\0')
 		{
 			free(shell.input);
 			shell.input = NULL;
-			continue ;
+			continue;
 		}
+
+		// Ajout à l'historique
 		add_history(shell.input);
-		shell.tokens = lexer(shell.input);
+
+		// Tokenisation
+		shell.tokens = tokenize(shell.input);
 		if (!shell.tokens)
 		{
 			free(shell.input);
 			shell.input = NULL;
-			continue ;
+			continue;
 		}
-		if (!validate_tokens(shell.tokens))
+
+		// Vérification syntaxe
+		if (check_tokens(shell.tokens))
 		{
 			shell.last_exit_status = 2;
 			free_tokens(shell.tokens);
 			shell.tokens = NULL;
 			free(shell.input);
 			shell.input = NULL;
-			continue ;
+			continue;
 		}
-		shell.commands = parser(shell.tokens);
+
+		// Expansion
+		expand_tokens(shell.tokens, &shell);
+		// Vérifier les redirections ambiguës AVANT le nettoyage
+		if (check_ambiguous_redirects(shell.tokens))
+		{
+			shell.last_exit_status = 1;
+			free_tokens(shell.tokens);
+			shell.tokens = NULL;
+			free(shell.input);
+			shell.input = NULL;
+			continue;
+		}
+		clean_empty_tokens(&shell.tokens);
+
+		// Si plus de tokens après nettoyage
+		if (!shell.tokens)
+		{
+			free(shell.input);
+			shell.input = NULL;
+			continue;
+		}
+
+		// Parsing
+		shell.commands = parse(shell.tokens);
 		if (!shell.commands)
 		{
 			shell.last_exit_status = 1;
@@ -79,11 +127,17 @@ int	main(int argc, char **argv, char **envp)
 			shell.tokens = NULL;
 			free(shell.input);
 			shell.input = NULL;
-			continue ;
+			continue;
 		}
-		expander(shell.commands, shell.env, shell.last_exit_status);
+
+		// Vérification commande valide
 		if (shell.commands->args)
+		{
+			// Exécution
 			executor(&shell);
+		}
+
+		// Nettoyage
 		if (shell.tokens)
 		{
 			free_tokens(shell.tokens);
@@ -91,7 +145,7 @@ int	main(int argc, char **argv, char **envp)
 		}
 		if (shell.commands)
 		{
-			free_commands(shell.commands);
+			free_cmds(shell.commands);
 			shell.commands = NULL;
 		}
 		if (shell.input)
@@ -100,14 +154,18 @@ int	main(int argc, char **argv, char **envp)
 			shell.input = NULL;
 		}
 	}
+
+	// Nettoyage final
 	if (shell.env)
-		free_env(shell.env);
+		free_env(shell.env);  // ✅ Utiliser free_env() au lieu de free_env_list()
 	if (shell.tokens)
 		free_tokens(shell.tokens);
 	if (shell.commands)
-		free_commands(shell.commands);
+		free_cmds(shell.commands);
 	if (shell.input)
 		free(shell.input);
+
 	rl_clear_history();
+
 	return (shell.last_exit_status);
 }

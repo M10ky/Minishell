@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 13:28:19 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/09 09:23:27 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/09 12:12:08 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void	free_commands(t_command *commands)
 	while (commands)
 	{
 		tmp = commands->next;
-		free_cmd(commands);
+		free_command(commands);
 		commands = tmp;
 	}
 }

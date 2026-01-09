@@ -3,17 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   expander_var1.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
+/*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/26 07:44:36 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/09 00:30:25 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/09 12:06:49 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/parsing.h"
 
-char	*get_env_value(char *key, t_env *env)
+
+char	*get_env_value(t_env *env, char *key)
 {
+	if (!env || !key)
+		return (NULL);
 	while (env)
 	{
 		if (ft_strcmp(env->key, key) == 0)

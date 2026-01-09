@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 11:01:22 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/09 06:40:54 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/09 12:10:03 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,5 +74,8 @@ void	cleanup_child(t_shell *shell);
 // ========== UTILITY ==========
 char	*get_next_line(int fd);
 void	exp_add_env_node_back(t_env **head, t_env *new_node);
+
+
+void	exec_simple_cmd_with_array(t_command *cmd, t_env *env, char **args_array);
 
 #endif
