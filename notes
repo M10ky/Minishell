@@ -25,3 +25,4 @@ PARSING >>> pipeline : lexer > parser > expand > globing > argv[] > exec
 	if
  	+++ Word split
 
+cd maina

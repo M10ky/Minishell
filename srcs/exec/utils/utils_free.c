@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 13:28:19 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/09 06:53:12 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/09 09:23:27 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,21 +104,12 @@ void	free_tab(char **tab)
 // }
 void	cleanup_child(t_shell *shell)
 {
-	// ✅ Libérer l'environnement
 	if (shell->env)
 		free_env(shell->env);
-
-	// ✅ Libérer les commandes
 	if (shell->commands)
 		free_commands(shell->commands);
-
-	// ✅ NOUVEAU : Libérer les tokens
 	if (shell->tokens)
 		free_tokens(shell->tokens);
-
-	// ✅ NOUVEAU : Libérer l'input
 	if (shell->input)
 		free(shell->input);
-
-	// Note: On ne fait PAS rl_clear_history() car c'est un fils
 }
