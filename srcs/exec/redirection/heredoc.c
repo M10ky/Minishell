@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 15:45:17 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/08 16:00:35 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/10 07:00:23 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -268,12 +268,14 @@ static int	child_heredoc_process(char *clean_delim, char *tmpfile,
 	if (create_heredoc_file(clean_delim, tmpfile) == -1)
 	{
 		free(clean_delim);
+		free(tmpfile);
 		cleanup_child(shell);
 		exit(130);
 	}
 	if (do_expand)
 		expand_heredoc_content(shell, tmpfile);
 	free(clean_delim);
+	free(tmpfile);
 	cleanup_child(shell);
 	exit(0);
 }
@@ -375,6 +377,7 @@ static int	process_single_heredoc_node(t_redir *heredoc_node, t_shell *shell,
 			free(tmpfile);
 			return (1);
 		}
+		// if (heredoc_node->file) // verifiena lony
 		free(heredoc_node->file);
 		heredoc_node->file = tmpfile;
 	}
