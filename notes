@@ -27,7 +27,8 @@ PARSING >>> pipeline : lexer > parser > expand > globing > argv[] > exec
 
 --leaks
 cd maina
-heredoc
+heredoc VITA
+command not found
 
 1-otrany efa vitanla 9janvier
 minishell> ls > $re
@@ -68,4 +69,13 @@ minishell> cd
 
 
 
+minishell>
+minishell> echo $?
+1
+minishell>
 
+
+mioky@mioky-GL552JX:~$
+mioky@mioky-GL552JX:~$ echo $?
+0
+mioky@mioky-GL552JX:~$

@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 20:13:41 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/09 11:43:31 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/10 08:02:30 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ void	child_process(t_command *cmd, t_shell *shell, int prev[2], int curr[2])
 			cleanup_child(shell);
 			exit(1);
 		}
-		exec_simple_cmd_with_array(cmd, shell->env, args_array);
+		exec_simple_cmd_with_array(cmd, shell->env, args_array, shell);
 		free(args_array);
 		cleanup_child(shell);
 		exit(126);
