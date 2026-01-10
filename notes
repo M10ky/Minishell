@@ -69,11 +69,11 @@ minishell> cd
 
 
 
+4 -
 minishell>
 minishell> echo $?
 1
 minishell>
-
 
 mioky@mioky-GL552JX:~$
 mioky@mioky-GL552JX:~$ echo $?

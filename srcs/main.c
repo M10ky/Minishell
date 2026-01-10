@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:33:27 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/09 16:48:46 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/10 08:33:20 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ int	main(int argc, char **argv, char **envp)
 		shell.tokens = lexer(shell.input);
 		if (!shell.tokens)
 		{
+			shell.last_exit_status = 0;
 			free(shell.input);
 			shell.input = NULL;
 			continue ;
@@ -74,7 +75,10 @@ int	main(int argc, char **argv, char **envp)
 		shell.commands = parser(shell.tokens);
 		if (!shell.commands)
 		{
-			shell.last_exit_status = 1;
+			if (shell.tokens && shell.tokens->type == END)
+				shell.last_exit_status = 0;
+			else
+				shell.last_exit_status = 1;
 			free_tokens(shell.tokens);
 			shell.tokens = NULL;
 			free(shell.input);
