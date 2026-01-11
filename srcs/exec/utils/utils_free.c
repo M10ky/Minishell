@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 13:28:19 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/11 12:28:31 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/11 14:56:19 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,13 +61,41 @@ void	free_commands(t_command *commands)
 
 void	cleanup_shell(t_shell *shell)
 {
+	if (!shell)
+		return ;
+
+	/* Libérer l'environnement */
 	if (shell->env)
+	{
 		free_env(shell->env);
+		shell->env = NULL;
+	}
+
+	/* Libérer les commandes */
 	if (shell->commands)
+	{
 		free_commands(shell->commands);
+		shell->commands = NULL;
+	}
+
+	/* Libérer les tokens */
+	if (shell->tokens)
+	{
+		free_tokens(shell->tokens);
+		shell->tokens = NULL;
+	}
+
+	/* Libérer l'input */
 	if (shell->input)
+	{
 		free(shell->input);
+		shell->input = NULL;
+	}
+
+	/* Libérer l'historique de readline */
+	rl_clear_history();
 }
+
 
 void	free_tab_partial(char **tab, int count)
 {
@@ -102,26 +130,36 @@ void	free_tab(char **tab)
 // 	if (shell->commands)
 // 		free_commands(shell->commands);
 // }
-void cleanup_child(t_shell *shell)
+void	cleanup_child(t_shell *shell)
 {
-    if (shell->env)
-    {
-        free_env(shell->env);
-        shell->env = NULL;  // ← Ajoutez ceci
-    }
-    if (shell->commands)
-    {
-        free_commands(shell->commands);
-        shell->commands = NULL;  // ← Ajoutez ceci
-    }
-    if (shell->tokens)
-    {
-        free_tokens(shell->tokens);
-        shell->tokens = NULL;  // ← Ajoutez ceci
-    }
-    if (shell->input)
-    {
-        free(shell->input);
-        shell->input = NULL;  // ← Ajoutez ceci
-    }
+	if (!shell)
+		return ;
+
+	/* Libérer l'environnement */
+	if (shell->env)
+	{
+		free_env(shell->env);
+		shell->env = NULL;
+	}
+
+	/* Libérer les commandes */
+	if (shell->commands)
+	{
+		free_commands(shell->commands);
+		shell->commands = NULL;
+	}
+
+	/* Libérer les tokens */
+	if (shell->tokens)
+	{
+		free_tokens(shell->tokens);
+		shell->tokens = NULL;
+	}
+
+	/* Libérer l'input */
+	if (shell->input)
+	{
+		free(shell->input);
+		shell->input = NULL;
+	}
 }
