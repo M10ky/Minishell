@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:31:02 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/11 16:21:24 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/11 22:43:05 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,12 +193,126 @@ static int	cd_error_chdir(char *dir, char *old_pwd)
 	return (1);
 }
 
-static void	update_pwd_vars(t_env *env, char *old_pwd)
+static char	*build_absolute_path(char *current_pwd, char *dir)
+{
+	char	*temp;
+	char	*result;
+
+	if (!current_pwd || !dir)
+		return (NULL);
+
+	/* Si dir est vide ou ".", rester dans current_pwd */
+	if (dir[0] == '\0' || (dir[0] == '.' && dir[1] == '\0'))
+		return (ft_strdup(current_pwd));
+
+	/* Construire : current_pwd + "/" + dir */
+	temp = ft_strjoin(current_pwd, "/");
+	if (!temp)
+		return (NULL);
+	result = ft_strjoin(temp, dir);
+	free(temp);
+	return (result);
+}
+
+/* ========== FONCTION AUXILIAIRE : Normaliser un chemin ========== */
+
+static char	*normalize_path(char *path)
+{
+	char	**parts;
+	char	**stack;
+	int		i;
+	int		j;
+	char	*result;
+	char	*temp;
+
+	if (!path || path[0] != '/')
+		return (ft_strdup(path));
+
+	parts = ft_split(path, '/');
+	if (!parts)
+		return (ft_strdup(path));
+
+	/* Compter les segments */
+	i = 0;
+	while (parts[i])
+		i++;
+
+	stack = malloc(sizeof(char *) * (i + 1));
+	if (!stack)
+	{
+		free_tab(parts);
+		return (ft_strdup(path));
+	}
+
+	/* Résoudre . et .. */
+	i = 0;
+	j = 0;
+	while (parts[i])
+	{
+		if (ft_strcmp(parts[i], "..") == 0)
+		{
+			if (j > 0)
+				j--;  /* Remonter d'un niveau */
+		}
+		else if (ft_strcmp(parts[i], ".") != 0 && parts[i][0] != '\0')
+		{
+			stack[j++] = parts[i];
+		}
+		i++;
+	}
+
+	/* Reconstruire le chemin */
+	if (j == 0)
+		result = ft_strdup("/");
+	else
+	{
+		result = ft_strdup("");
+		i = 0;
+		while (i < j)
+		{
+			temp = ft_strjoin(result, "/");
+			free(result);
+			result = ft_strjoin(temp, stack[i]);
+			free(temp);
+			i++;
+		}
+	}
+
+	free(stack);
+	free_tab(parts);
+	return (result);
+}
+
+static void	update_pwd_vars(t_env *env, char *old_pwd, char *new_dir)
 {
 	char	*new_pwd;
+	char	*temp;
 
 	update_env_var(env, "OLDPWD", old_pwd);
-	new_pwd = getcwd(NULL, 0);
+
+	/* Chemin absolu : normaliser et utiliser */
+	if (new_dir && new_dir[0] == '/')
+	{
+		new_pwd = normalize_path(new_dir);
+	}
+	/* Chemin relatif : construire depuis PWD actuel */
+	else if (new_dir)
+	{
+		temp = build_absolute_path(old_pwd, new_dir);
+		if (temp)
+		{
+			new_pwd = normalize_path(temp);
+			free(temp);
+		}
+		else
+			new_pwd = getcwd(NULL, 0);
+	}
+	/* Fallback */
+	else
+	{
+		new_pwd = getcwd(NULL, 0);
+	}
+
 	if (new_pwd)
 	{
 		update_env_var(env, "PWD", new_pwd);
@@ -206,20 +320,18 @@ static void	update_pwd_vars(t_env *env, char *old_pwd)
 	}
 }
 
+
 int	builtin_cd(char **args, t_env *env)
 {
 	char	*dir;
 	char	*old_pwd;
 
-	old_pwd = getcwd(NULL, 0);
-
-	/* CORRECTION : Vérifier args != NULL avant d'accéder aux éléments */
-	if (args && args[1] && args[2])
-	{
-		ft_putstr_fd("minishell: cd: too many arguments\n", 2);
-		free(old_pwd);  // Ne pas oublier de libérer !
-		return (1);
-	}
+	/* Récupérer PWD depuis l'environnement (chemin logique) */
+	old_pwd = get_env_value(env, "PWD");
+	if (!old_pwd)
+		old_pwd = getcwd(NULL, 0);
+	else
+		old_pwd = ft_strdup(old_pwd);
 
 	if (!old_pwd)
 	{
@@ -227,7 +339,7 @@ int	builtin_cd(char **args, t_env *env)
 		return (1);
 	}
 
-	/* args peut être NULL ou args[1] peut être NULL */
+	/* Déterminer le répertoire cible */
 	if (!args || !args[1])
 		dir = get_env_value(env, "HOME");
 	else
@@ -236,10 +348,12 @@ int	builtin_cd(char **args, t_env *env)
 	if (!dir)
 		return (cd_error_no_home(old_pwd));
 
+	/* Effectuer le changement de répertoire */
 	if (chdir(dir) != 0)
 		return (cd_error_chdir(dir, old_pwd));
 
-	update_pwd_vars(env, old_pwd);
+	/* Mettre à jour PWD et OLDPWD */
+	update_pwd_vars(env, old_pwd, dir);
 	free(old_pwd);
 	return (0);
 }
