@@ -79,6 +79,8 @@ mioky@mioky-GL552JX:~$
 
 
 --leaks
-cd maina
+cd maina VITA
 heredoc VITA
 command not found . sy ..
+exit
+
