@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 10:49:05 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/09 12:04:04 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/11 17:47:52 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,7 +226,10 @@ char	**env_to_tab(t_env *env)
 			free_tab_partial(env_tab, i);
 			return (NULL);
 		}
-		env_tab[i] = ft_strjoin(temp, env->value);
+		if (env->value)
+			env_tab[i] = ft_strjoin(temp, env->value);
+		else
+			env_tab[i] = ft_strjoin(temp, "");
 		free(temp);
 		if (!env_tab[i])
 		{

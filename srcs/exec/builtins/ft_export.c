@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/04 22:37:54 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/08 16:00:16 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/11 17:45:55 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,8 @@ int	ft_export(t_shell *shell, char **args)
 		if (!is_valid_identifier(args[i]))
 		{
 			printf("export: `%s': not a valid identifier\n", args[i]);
-			return (1);
+			i++;
+			continue ;
 		}
 		key = extract_key(args[i]);
 		value = extract_value(args[i]);
@@ -138,7 +139,7 @@ int	ft_export(t_shell *shell, char **args)
 			free(value);
 		}
 		else
-			update_or_add_env(shell, key, NULL);
+			update_or_add_env(shell, key, "");
 		free(key);
 		i++;
 	}
