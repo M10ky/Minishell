@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 20:32:05 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/11 12:38:17 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/11 16:53:28 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,6 +135,11 @@ void	exec_simple_cmd_with_array(t_command *cmd, t_env *env,
 			sh_args[1] = ft_strdup(path);
 			sh_args[2] = NULL;
 			execve(sh_args[0], sh_args, env_tab);
+			if (sh_args[0])
+				free(sh_args[0]);
+			if (sh_args[1])
+				free(sh_args[1]);
+			free(sh_args);
 		}
 	}
 	perror("minishell");

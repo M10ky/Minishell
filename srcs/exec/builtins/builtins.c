@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/17 21:32:09 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/11 14:53:42 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/11 15:11:45 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,8 +129,8 @@ int	execute_builtin(t_command *cmd, t_shell *shell)
 		return (result);
 	}
 	result = execute_builtin_part2(shell, args_array);
-	if (ft_strcmp(args_array[0], "exit") != 0)
-		free(args_array);
+	// if (ft_strcmp(args_array[0], "exit") != 0)
+	free(args_array);
 	return (result);
 }
 

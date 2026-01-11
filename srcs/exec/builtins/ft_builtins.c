@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:31:02 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/09 16:59:34 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/11 16:21:24 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,11 +125,12 @@ int	ft_atoll_safe(const char *str, long long *result)
 	*result = res * sign;
 	return (0);
 }
-static void	exit_with_error(char *arg, t_shell *shell)
+static void	exit_with_error(char *arg, t_shell *shell, char **args_array)
 {
 	ft_putstr_fd("minishell: exit: ", 2);
 	ft_putstr_fd(arg, 2);
 	ft_putstr_fd(": numeric argument required\n", 2);
+	free(args_array);
 	if (shell->commands->next)
 		cleanup_child(shell);
 	else
@@ -147,12 +148,16 @@ int	builtin_exit(char **args, t_shell *shell)
 	{
 		if (!is_valid_exit_arg(args[1]) || ft_atoll_safe(args[1], &exit_code) ==
 			-1)
-			exit_with_error(args[1], shell);
+			exit_with_error(args[1], shell, args);
 		if (args[2])
+		{
+			free(args);
 			return (handle_too_many_args());
+		}
 	}
 	else
 		exit_code = shell->last_exit_status;
+	free(args);
 	if (shell->commands->next)
 		cleanup_child(shell);
 	else

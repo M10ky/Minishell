@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 15:45:17 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/10 07:00:23 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/11 16:43:56 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -373,6 +373,7 @@ static int	process_single_heredoc_node(t_redir *heredoc_node, t_shell *shell,
 	{
 		if (parent_wait_heredoc(pid, shell))
 		{
+			// unlink(tmpfile);
 			free(clean_delim);
 			free(tmpfile);
 			return (1);
