@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 20:32:05 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/11 12:20:22 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/11 12:38:17 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,17 +83,19 @@ static void	handle_exec_error(char *cmd, char *path)
 	}
 }
 
-static void	check_special_cases(char *cmd, t_shell *shell)
+static void	check_special_cases(char *cmd, t_shell *shell, char **args_array)
 {
 	if (ft_strcmp(cmd, ".") == 0)
 	{
 		ft_putstr_fd("minishell: .: filename argument required\n", 2);
+		free(args_array);
 		cleanup_child(shell);//ito
 		exit(2);
 	}
 	if (ft_strcmp(cmd, "..") == 0)
 	{
 		ft_putstr_fd("minishell: ..: command not found\n", 2);
+		free(args_array);
 		cleanup_child(shell);//ito
 		exit(127);
 	}
@@ -109,7 +111,7 @@ void	exec_simple_cmd_with_array(t_command *cmd, t_env *env,
 
 	if (!cmd || !args_array || !args_array[0])
 		exit(0);
-	check_special_cases(args_array[0], shell);
+	check_special_cases(args_array[0], shell, args_array);
 
 	path = get_path(env, args_array[0]);
 	if (!path)
