@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 20:32:05 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/10 08:07:01 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/11 10:14:35 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,13 +89,12 @@ static void	check_special_cases(char *cmd, t_shell *shell)
 	{
 		ft_putstr_fd("minishell: .: filename argument required\n", 2);
 		cleanup_child(shell);//ito
-		cleanup_shell(shell); //ito
 		exit(2);
 	}
 	if (ft_strcmp(cmd, "..") == 0)
 	{
 		ft_putstr_fd("minishell: ..: command not found\n", 2);
-		cleanup_shell(shell);//ito
+		cleanup_child(shell);//ito
 		exit(127);
 	}
 }

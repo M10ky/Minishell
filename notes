@@ -25,10 +25,7 @@ PARSING >>> pipeline : lexer > parser > expand > globing > argv[] > exec
 	if
  	+++ Word split
 
---leaks
-cd maina
-heredoc VITA
-command not found
+
 
 1-otrany efa vitanla 9janvier
 minishell> ls > $re
@@ -79,3 +76,9 @@ mioky@mioky-GL552JX:~$
 mioky@mioky-GL552JX:~$ echo $?
 0
 mioky@mioky-GL552JX:~$
+
+
+--leaks
+cd maina
+heredoc VITA
+command not found . sy ..
