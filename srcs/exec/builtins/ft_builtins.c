@@ -6,7 +6,7 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 21:31:02 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/11 22:43:05 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/11 22:58:25 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,7 @@ int	builtin_exit(char **args, t_shell *shell)
 			exit_with_error(args[1], shell, args);
 		if (args[2])
 		{
-			free(args);
+			// free(args);
 			return (handle_too_many_args());
 		}
 	}
