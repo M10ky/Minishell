@@ -6,43 +6,11 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/04 15:17:38 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/08 16:00:40 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/13 14:41:59 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/exec.h"
-
-void	sig_handler_prompt(int sig)
-{
-	(void)sig;
-	g_received_signal = SIGINT;
-	write(STDOUT_FILENO, "\n", 1);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
-}
-
-void	sig_handler_exec(int sig)
-{
-	if (sig == SIGINT)
-	{
-		g_received_signal = SIGINT;
-	}
-	else if (sig == SIGQUIT)
-	{
-		g_received_signal = SIGQUIT;
-	}
-}
-
-void	sig_handler_heredoc(int sig)
-{
-	if (sig == SIGINT)
-	{
-		g_received_signal = SIGINT;
-		write(STDOUT_FILENO, "\n", 1);
-		close(STDIN_FILENO);
-	}
-}
 
 void	setup_prompt_signal(void)
 {
@@ -57,6 +25,10 @@ void	setup_prompt_signal(void)
 	sa_quit.sa_flags = 0;
 	sa_quit.sa_handler = SIG_IGN;
 	sigaction(SIGQUIT, &sa_quit, NULL);
+	sigemptyset(&sa_quit.sa_mask);
+	sa_quit.sa_flags = 0;
+	sa_quit.sa_handler = SIG_IGN;
+	sigaction(SIGTSTP, &sa_quit, NULL);
 }
 
 void	setup_exec_signals(void)

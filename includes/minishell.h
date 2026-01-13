@@ -6,20 +6,15 @@
 /*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 20:22:34 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/08 22:01:21 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/13 14:04:56 by tarandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include <stdlib.h>
-# include <unistd.h>
-# include <stdio.h>
-# include <string.h>
 # include <limits.h>
 # include <fcntl.h>
-# include <sys/types.h>
 # include <sys/wait.h>
 # include <sys/stat.h>
 # include <errno.h>
@@ -28,8 +23,7 @@
 # include <readline/history.h>
 # include "../libft/libft.h"
 
-extern int g_received_signal;
-
+extern int	g_received_signal;
 
 typedef struct s_env
 {
@@ -50,36 +44,52 @@ typedef enum e_token_type
 	ERROR
 }	t_token_type;
 
+typedef enum e_quote_type
+{
+	QUOTE_NONE,
+	QUOTE_SINGLE,
+	QUOTE_DOUBLE
+}	t_quote_type;
+
+typedef struct s_segment
+{
+	char				*value;
+	t_quote_type		quote;
+	struct s_segment	*next;
+}	t_segment;
+
 typedef struct s_token
 {
 	t_token_type	type;
-	char			*value;
-	int				was_quoted;
+	t_segment		*segments;
+	char			*literal;
 	struct s_token	*next;
 }	t_token;
 
 typedef struct s_redir
 {
-    char            *file;
-    int             fd;
-    int             append_mode;
-    struct s_redir  *next;
-} t_redir;
+	char			*file;
+	int				fd;
+	int				append_mode;
+	struct s_redir	*next;
+}	t_redir;
 
 typedef struct s_arg
 {
-    char *value;
-    int   was_quoted;
-} t_arg;
+	char				*value;
+	struct s_segment	*segments;
+	int					was_quoted;
+	struct s_arg		*next;
+}	t_arg;
 
 typedef struct s_command
 {
-    t_arg			*args;
-    t_redir			*input_redirection;
-    t_redir			*output_redirection;
-    t_redir			*heredoc;
-    struct s_command *next;
-} t_command;
+	t_arg				*args;
+	t_redir				*input_redirection;
+	t_redir				*output_redirection;
+	t_redir				*heredoc;
+	struct s_command	*next;
+}	t_command;
 
 typedef struct s_shell
 {

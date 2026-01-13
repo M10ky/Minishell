@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/18 21:33:27 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/11 15:02:30 by miokrako         ###   ########.fr       */
+/*   Created: 2025/12/15 09:40:43 by tarandri          #+#    #+#             */
+/*   Updated: 2026/01/13 16:48:18 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,104 +14,67 @@
 
 int	g_received_signal = 0;
 
-int	main(int argc, char **argv, char **envp)
+static void	process_input(t_shell *shell)
+{
+	signal(SIGINT, SIG_IGN);
+	shell->tokens = lexer(shell->input);
+	if (shell->tokens)
+	{
+		shell->commands = parser(shell->tokens, shell);
+		if (shell->commands)
+		{
+			expander(shell, shell->commands);
+			executor(shell);
+		}
+	}
+}
+
+static void	check_interrupted_signal(t_shell *shell)
+{
+	if (g_received_signal == SIGINT)
+	{
+		shell->last_exit_status = 130;
+		g_received_signal = 0;
+	}
+}
+
+static void	minishell_loop(t_shell *shell)
+{
+	while (1)
+	{
+		setup_prompt_signal();
+		g_received_signal = 0;
+		shell->input = readline("minishell$> ");
+		check_interrupted_signal(shell);
+		if (!shell->input)
+		{
+			printf("exit\n");
+			break ;
+		}
+		if (*shell->input)
+		{
+			add_history(shell->input);
+			if (is_exit_command(shell->input))
+			{
+				free(shell->input);
+				shell->input = NULL;
+				break ;
+			}
+			process_input(shell);
+		}
+		reset_loop(shell);
+	}
+}
+
+int	main(int ac, char **av, char **envp)
 {
 	t_shell	shell;
 
-	(void)argc;
-	(void)argv;
-	shell.input = NULL;
-	shell.env = NULL;
-	shell.tokens = NULL;
-	shell.commands = NULL;
-	shell.last_exit_status = 0;
-	if (!envp)
-	{
-		ft_putstr_fd("minishell: invalid environment\n", 2);
-		return (1);
-	}
-	init_env(&shell, envp);
-	setup_prompt_signal();
-	while (1)
-	{
-		g_received_signal = 0;
-		shell.input = readline("minishell> ");
-		if (g_received_signal == SIGINT)
-		{
-			shell.last_exit_status = 130;
-			g_received_signal = 0;
-			if (!shell.input)
-				continue ;
-		}
-		if (!shell.input)
-		{
-			ft_putstr_fd("exit\n", 2);
-			break ;
-		}
-		if (shell.input[0] == '\0')
-		{
-			free(shell.input);
-			shell.input = NULL;
-			continue ;
-		}
-		add_history(shell.input);
-		shell.tokens = lexer(shell.input);
-		if (!shell.tokens)
-		{
-			shell.last_exit_status = 0;
-			free(shell.input);
-			shell.input = NULL;
-			continue ;
-		}
-		if (!validate_tokens(shell.tokens))
-		{
-			shell.last_exit_status = 2;
-			free_tokens(shell.tokens);
-			shell.tokens = NULL;
-			free(shell.input);
-			shell.input = NULL;
-			continue ;
-		}
-		shell.commands = parser(shell.tokens);
-		if (!shell.commands)
-		{
-			if (shell.tokens && shell.tokens->type == END)
-				shell.last_exit_status = 0;
-			else
-				shell.last_exit_status = 1;
-			free_tokens(shell.tokens);
-			shell.tokens = NULL;
-			free(shell.input);
-			shell.input = NULL;
-			continue ;
-		}
-		expander(shell.commands, shell.env, shell.last_exit_status);
-		// if (shell.commands->args)
-		executor(&shell);
-		if (shell.tokens)
-		{
-			free_tokens(shell.tokens);
-			shell.tokens = NULL;
-		}
-		if (shell.commands)
-		{
-			free_commands(shell.commands);
-			shell.commands = NULL;
-		}
-		if (shell.input)
-		{
-			free(shell.input);
-			shell.input = NULL;
-		}
-	}
-	if (shell.env)
-		free_env(shell.env);
-	if (shell.tokens)
-		free_tokens(shell.tokens);
-	if (shell.commands)
-		free_commands(shell.commands);
-	if (shell.input)
-		free(shell.input);
-	rl_clear_history();
+	(void)ac;
+	(void)av;
+	ft_memset(&shell, 0, sizeof(t_shell));
+	init_shell(&shell, envp);
+	minishell_loop(&shell);
+	cleanup_exit(&shell);
 	return (shell.last_exit_status);
 }

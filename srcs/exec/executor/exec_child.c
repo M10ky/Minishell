@@ -6,63 +6,39 @@
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 20:13:41 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/10 08:02:30 by miokrako         ###   ########.fr       */
+/*   Updated: 2026/01/13 20:51:15 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/exec.h"
 
-static void	setup_pipes(t_command *cmd, int prev_pipe[2], int curr_pipe[2])
+static void	exec_builtin_child(t_command *cmd, t_shell *shell)
 {
-	if (prev_pipe[0] != -1)
-	{
-		dup2(prev_pipe[0], STDIN_FILENO);
-		close(prev_pipe[0]);
-		if (prev_pipe[1] != -1)
-			close(prev_pipe[1]);
-	}
-	if (cmd->next)
-	{
-		if (curr_pipe[0] != -1)
-			close(curr_pipe[0]);
-		if (curr_pipe[1] != -1)
-		{
-			dup2(curr_pipe[1], STDOUT_FILENO);
-			close(curr_pipe[1]);
-		}
-	}
+	int	ret;
+
+	ret = execute_builtin(cmd, shell);
+	cleanup_child(shell);
+	exit(ret);
 }
 
-// Helper function to convert t_arg array to char** array
-static char	**convert_args_to_array(t_arg *args)
+static void	exec_external_cmd(t_command *cmd, t_shell *shell)
 {
-	char	**result;
-	int		count;
-	int		i;
+	char	**args_array;
 
-	if (!args)
-		return (NULL);
-	count = 0;
-	while (args[count].value)
-		count++;
-	result = (char **)malloc(sizeof(char *) * (count + 1));
-	if (!result)
-		return (NULL);
-	i = 0;
-	while (i < count)
+	args_array = args_to_array(cmd->args);
+	if (!args_array)
 	{
-		result[i] = args[i].value;
-		i++;
+		cleanup_child(shell);
+		exit(1);
 	}
-	result[i] = NULL;
-	return (result);
+	exec_simple_cmd_with_array(cmd, shell->env, args_array, shell);
+	free(args_array);
+	cleanup_child(shell);
+	exit(126);
 }
 
 void	child_process(t_command *cmd, t_shell *shell, int prev[2], int curr[2])
 {
-	int		ret;
-	char	**args_array;
-
 	setup_child_signals();
 	setup_pipes(cmd, prev, curr);
 	if (handle_redirections(cmd) != 0)
@@ -70,43 +46,15 @@ void	child_process(t_command *cmd, t_shell *shell, int prev[2], int curr[2])
 		cleanup_child(shell);
 		exit(1);
 	}
-	if (!cmd->args || !cmd->args[0].value)
+	if (!cmd->args || !cmd->args->value)
 	{
 		cleanup_child(shell);
 		exit(0);
 	}
-	if (is_builtin(cmd->args[0].value))
-	{
-		ret = execute_builtin(cmd, shell);
-		cleanup_child(shell);
-		exit(ret);
-	}
+	if (is_builtin(cmd->args->value))
+		exec_builtin_child(cmd, shell);
 	else
-	{
-		args_array = convert_args_to_array(cmd->args);
-		if (!args_array)
-		{
-			cleanup_child(shell);
-			exit(1);
-		}
-		exec_simple_cmd_with_array(cmd, shell->env, args_array, shell);
-		free(args_array);
-		cleanup_child(shell);
-		exit(126);
-	}
-}
-
-static void	update_exit_status(t_shell *shell, int last_status, int sig_int,
-		int sig_quit)
-{
-	if (WIFEXITED(last_status))
-		shell->last_exit_status = WEXITSTATUS(last_status);
-	else if (WIFSIGNALED(last_status))
-		shell->last_exit_status = 128 + WTERMSIG(last_status);
-	if (sig_int)
-		write(1, "\n", 1);
-	else if (sig_quit)
-		ft_putstr_fd("Quit (core dumped)\n", 2);
+		exec_external_cmd(cmd, shell);
 }
 
 void	wait_all_children(pid_t last_pid, t_shell *shell)
@@ -114,10 +62,11 @@ void	wait_all_children(pid_t last_pid, t_shell *shell)
 	pid_t	wpid;
 	int		status;
 	int		last_status;
-	int		sig[2];
+	int		any_sig_int;
+	int		last_sig_quit;
 
-	sig[0] = 0;
-	sig[1] = 0;
+	any_sig_int = 0;
+	last_sig_quit = 0;
 	last_status = 0;
 	signal(SIGINT, SIG_IGN);
 	signal(SIGQUIT, SIG_IGN);
@@ -126,16 +75,15 @@ void	wait_all_children(pid_t last_pid, t_shell *shell)
 		wpid = waitpid(-1, &status, 0);
 		if (wpid == -1)
 			break ;
-		if (WIFSIGNALED(status))
-		{
-			if (WTERMSIG(status) == SIGINT)
-				sig[0] = 1;
-			else if (WTERMSIG(status) == SIGQUIT)
-				sig[1] = 1;
-		}
+		if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
+			any_sig_int = 1;
 		if (wpid == last_pid)
+		{
 			last_status = status;
+			if (WIFSIGNALED(status) && WTERMSIG(status) == SIGQUIT)
+				last_sig_quit = 1;
+		}
 	}
 	setup_prompt_signal();
-	update_exit_status(shell, last_status, sig[0], sig[1]);
+	update_exit_status(shell, last_status, any_sig_int, last_sig_quit);
 }

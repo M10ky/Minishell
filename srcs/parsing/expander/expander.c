@@ -6,98 +6,75 @@
 /*   By: tarandri <tarandri@student.42antananarivo. +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/26 07:44:36 by tarandri          #+#    #+#             */
-/*   Updated: 2026/01/09 00:29:22 by tarandri         ###   ########.fr       */
+/*   Updated: 2026/01/13 16:21:43 by tarandri         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/parsing.h"
 
-void	expand_args(t_command *cmd, t_env *env, int last_exit_status)
+static void	splice_args(t_command *cmd, t_arg *prev, t_arg *curr, t_arg *new_l)
 {
-	t_arg	*new_args;
-	int		count;
-	int		i;
-	char	*expanded;
-	char	**words;
-	int		j;
+	t_arg	*last_new;
 
-	new_args = NULL;
-	count = 0;
-	i = 0;
-	if (!cmd->args)
-		return ;
-	while (cmd->args[i].value)
+	if (new_l)
 	{
-		expanded = expand_variables(cmd->args[i].value, env, last_exit_status);
-		if (!expanded)
-			expanded = ft_strdup("");
-		if (!cmd->args[i].was_quoted)
-		{
-			words = word_split(expanded, env);
-			j = 0;
-			while (words && words[j])
-			{
-				push_arg(&new_args, &count, words[j], 0);
-				j++;
-			}
-			free_split(words);
-		}
+		if (prev)
+			prev->next = new_l;
 		else
-			push_arg(&new_args, &count, expanded, 1);
-		free(expanded);
-		i++;
+			cmd->args = new_l;
+		last_new = new_l;
+		while (last_new->next)
+			last_new = last_new->next;
+		last_new->next = curr->next;
 	}
-	replace_args(cmd, new_args, count);
+	else
+	{
+		if (prev)
+			prev->next = curr->next;
+		else
+			cmd->args = curr->next;
+	}
 }
 
-void	expand_redirections(t_command *cmd, t_env *env, int exit_status)
+static void	process_arg_list(t_shell *shell, t_command *c)
 {
-	t_redir	*redir;
-	char	*expanded;
-	char	*tmp;
+	t_arg	*curr;
+	t_arg	*prev;
+	t_arg	*next_save;
+	t_arg	*expanded_list;
 
-	redir = cmd->input_redirection;
-	while (redir)
+	curr = c->args;
+	prev = NULL;
+	while (curr)
 	{
-		expanded = expand_redir_file(redir->file, env, exit_status);
-		if (expanded)
+		next_save = curr->next;
+		expanded_list = expand_arg_to_list(curr, shell);
+		splice_args(c, prev, curr, expanded_list);
+		if (expanded_list)
 		{
-			tmp = redir->file;
-			redir->file = expanded;
-			free(tmp);
+			prev = expanded_list;
+			while (prev->next != next_save)
+				prev = prev->next;
 		}
-		redir = redir->next;
-	}
-	redir = cmd->output_redirection;
-	while (redir)
-	{
-		expanded = expand_redir_file(redir->file, env, exit_status);
-		if (expanded)
-		{
-			tmp = redir->file;
-			redir->file = expanded;
-			free(tmp);
-		}
-		redir = redir->next;
+		if (curr->value)
+			free(curr->value);
+		free_segments(curr->segments);
+		free(curr);
+		curr = next_save;
 	}
 }
 
-void	expand_command(t_command *cmd, t_env *env, int last_exit_status)
+void	expander(t_shell *shell, t_command *cmd)
 {
-	if (!cmd)
-		return ;
-	expand_args(cmd, env, last_exit_status);
-	expand_redirections(cmd, env, last_exit_status);
-}
+	t_command	*c;
 
-void	expander(t_command *commands, t_env *env, int last_exit_status)
-{
-	t_command	*current;
-
-	current = commands;
-	while (current)
+	c = cmd;
+	while (c)
 	{
-		expand_command(current, env, last_exit_status);
-		current = current->next;
+		process_arg_list(shell, c);
+		if (!process_redirs(c->input_redirection, shell)
+			|| !process_redirs(c->output_redirection, shell))
+			shell->last_exit_status = 1;
+		c = c->next;
 	}
 }

@@ -1,53 +1,45 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils_free.c                                       :+:      :+:    :+:   */
+/*   handler.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: miokrako <miokrako@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/26 13:28:19 by miokrako          #+#    #+#             */
-/*   Updated: 2026/01/13 14:10:51 by miokrako         ###   ########.fr       */
+/*   Created: 2026/01/11 23:32:57 by miokrako          #+#    #+#             */
+/*   Updated: 2026/01/11 23:33:57 by miokrako         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../../includes/exec.h"
 
-void	free_env(t_env *env)
+void	sig_handler_prompt(int sig)
 {
-	t_env	*tmp;
+	(void)sig;
+	g_received_signal = SIGINT;
+	write(STDOUT_FILENO, "\n", 1);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
+}
 
-	while (env)
+void	sig_handler_exec(int sig)
+{
+	if (sig == SIGINT)
 	{
-		tmp = env->next;
-		free(env->key);
-		free(env->value);
-		free(env);
-		env = tmp;
+		g_received_signal = SIGINT;
+	}
+	else if (sig == SIGQUIT)
+	{
+		g_received_signal = SIGQUIT;
 	}
 }
 
-void	free_tab_partial(char **tab, int count)
+void	sig_handler_heredoc(int sig)
 {
-	int	i;
-
-	i = 0;
-	while (i < count)
+	if (sig == SIGINT)
 	{
-		free(tab[i]);
-		i++;
+		g_received_signal = SIGINT;
+		write(STDOUT_FILENO, "\n", 1);
+		close(STDIN_FILENO);
 	}
-	free(tab);
-}
-
-void	free_tab(char **tab)
-{
-	int	i;
-
-	i = 0;
-	while (tab[i])
-	{
-		free(tab[i]);
-		i++;
-	}
-	free(tab);
 }
